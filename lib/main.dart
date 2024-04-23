@@ -22,7 +22,6 @@ class _MyAppState extends State<MyApp> {
   bool _isLoading = true;
   bool _showLoginPage = true;
   late User _user;
-  int _nroConexion = 0;
 
   @override
   void initState() {
@@ -59,8 +58,6 @@ class _MyAppState extends State<MyApp> {
               ? const LoadingScreen()
               : HomeScreen(
                   user: _user,
-                  nroConexion: _nroConexion,
-                  imei: '',
                 ),
     );
   }
@@ -73,13 +70,11 @@ class _MyAppState extends State<MyApp> {
     if (isRemembered) {
       String? userBody = prefs.getString('userBody');
       String date = prefs.getString('date').toString();
-      int nroConexion = prefs.getInt('nroConexion') as int;
       String dateAlmacenada = date.substring(0, 10);
       String dateActual = DateTime.now().toString().substring(0, 10);
       if (userBody != null) {
         var decodedJson = jsonDecode(userBody);
         _user = User.fromJson(decodedJson);
-        _nroConexion = nroConexion;
         if (dateAlmacenada != dateActual) {
           _showLoginPage = true;
         } else {

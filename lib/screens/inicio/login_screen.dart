@@ -344,6 +344,15 @@ class _LoginScreenState extends State<LoginScreen> {
     if (_rememberme) {
       _storeUser(body);
     }
+
+    if (user.codigoCausante == user.login) {
+      Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(
+              builder: (context) => HomeScreen(
+                    user: user,
+                  )));
+    }
   }
 
 //-----------------------------------------------------------------

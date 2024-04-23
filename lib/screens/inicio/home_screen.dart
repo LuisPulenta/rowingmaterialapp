@@ -6,15 +6,8 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 class HomeScreen extends StatefulWidget {
   final User user;
-  final int nroConexion;
-  final String imei;
 
-  const HomeScreen(
-      {Key? key,
-      required this.user,
-      required this.nroConexion,
-      required this.imei})
-      : super(key: key);
+  const HomeScreen({Key? key, required this.user}) : super(key: key);
 
   @override
   _HomeScreenState createState() => _HomeScreenState();
