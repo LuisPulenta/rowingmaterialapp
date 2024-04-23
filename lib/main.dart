@@ -11,6 +11,7 @@ void main() {
   runApp(const MyApp());
 }
 
+//--------------------------------------------------------------------------
 class MyApp extends StatefulWidget {
   const MyApp({Key? key}) : super(key: key);
 
@@ -18,6 +19,7 @@ class MyApp extends StatefulWidget {
   State<MyApp> createState() => _MyAppState();
 }
 
+//--------------------------------------------------------------------------
 class _MyAppState extends State<MyApp> {
   bool _isLoading = true;
   bool _showLoginPage = true;
@@ -62,6 +64,7 @@ class _MyAppState extends State<MyApp> {
     );
   }
 
+//--------------------------------------------------------------------------
   void _getHome() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
 

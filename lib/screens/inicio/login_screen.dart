@@ -1,12 +1,8 @@
-import 'dart:async';
 import 'dart:convert';
-import 'dart:math';
 import 'package:adaptive_dialog/adaptive_dialog.dart';
 import 'package:connectivity/connectivity.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:http/http.dart' as http;
-import 'package:rowingmaterialapp/helpers/api_helper.dart';
 import 'package:rowingmaterialapp/helpers/constants.dart';
 import 'package:rowingmaterialapp/components/loader_component.dart';
 import 'package:rowingmaterialapp/models/models.dart';
@@ -28,8 +24,8 @@ class _LoginScreenState extends State<LoginScreen> {
   //String _email = '';
   //String _password = '';
 
-  String _email = 'KEYPRESS';
-  String _password = 'KEYROOT';
+  String _email = '102131';
+  String _password = '32766601';
 
   String _emailError = '';
   bool _emailShowError = false;
@@ -81,9 +77,20 @@ class _LoginScreenState extends State<LoginScreen> {
               ),
               child: Column(
                 children: [
+                  const SizedBox(
+                    height: 100,
+                  ),
                   Image.asset(
                     "assets/logo.png",
-                    height: 200,
+                    height: 100,
+                    width: 500,
+                  ),
+                  const Text(
+                    'MATERIALES',
+                    style: TextStyle(
+                        fontSize: 32,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.white),
                   ),
                   Row(
                     mainAxisAlignment: MainAxisAlignment.center,
@@ -236,6 +243,14 @@ class _LoginScreenState extends State<LoginScreen> {
         children: <Widget>[
           Expanded(
             child: ElevatedButton(
+              style: ElevatedButton.styleFrom(
+                backgroundColor: const Color(0xFF781f1e),
+                minimumSize: const Size(double.infinity, 50),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(5),
+                ),
+              ),
+              onPressed: () => _login(),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: const [
@@ -246,14 +261,6 @@ class _LoginScreenState extends State<LoginScreen> {
                   Text('Iniciar Sesión'),
                 ],
               ),
-              style: ElevatedButton.styleFrom(
-                backgroundColor: const Color(0xFF781f1e),
-                minimumSize: const Size(double.infinity, 50),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(5),
-                ),
-              ),
-              onPressed: () => _login(),
             ),
           ),
         ],

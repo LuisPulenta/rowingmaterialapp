@@ -1,4 +1,3 @@
-import 'package:connectivity/connectivity.dart';
 import 'package:flutter/material.dart';
 import 'package:rowingmaterialapp/models/models.dart';
 import 'package:rowingmaterialapp/screens/screens.dart';
@@ -18,9 +17,6 @@ class _HomeScreenState extends State<HomeScreen> {
 //----------------------- Variables -----------------------------
 //---------------------------------------------------------------
 
-  String _codigo = '';
-  int? _nroConexion = 0;
-
   String direccion = '';
 
   //---------------------------------------------------------------
@@ -30,10 +26,6 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   void initState() {
     super.initState();
-
-    if (widget.user.habilitaRRHH != 1) {
-      _codigo = widget.user.codigoCausante;
-    }
   }
 
 //---------------------------------------------------------------
@@ -70,15 +62,31 @@ class _HomeScreenState extends State<HomeScreen> {
           children: [
             Image.asset(
               "assets/logo.png",
-              height: 200,
+              height: 100,
+              width: 500,
             ),
-
-            // Image.asset(
-            //   "assets/${widget.user.modulo.toLowerCase()}.png",
-            //   height: 200,
-            // ),
+            const Text(
+              'MATERIALES',
+              style: TextStyle(
+                  fontSize: 32,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.white),
+            ),
+            const SizedBox(
+              height: 120,
+            ),
+            const Text(
+              'Bienvenido/a',
+              style: TextStyle(
+                  fontSize: 20,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.white),
+            ),
+            const SizedBox(
+              height: 20,
+            ),
             Text(
-              'Bienvenido/a ${widget.user.fullName}',
+              widget.user.nombre!.replaceAll("  ", ""),
               style: const TextStyle(
                   fontSize: 20,
                   fontWeight: FontWeight.bold,
@@ -143,7 +151,7 @@ class _HomeScreenState extends State<HomeScreen> {
                             color: Colors.white, fontWeight: FontWeight.bold)),
                       ),
                       Text(
-                        widget.user.fullName,
+                        widget.user.nombre!.replaceAll("  ", ""),
                         style: (const TextStyle(color: Colors.white)),
                       ),
                     ],
@@ -163,31 +171,15 @@ class _HomeScreenState extends State<HomeScreen> {
             Row(
               children: [
                 Expanded(
-                  child: ExpansionTile(
-                    collapsedIconColor: Colors.white,
-                    iconColor: Colors.white,
+                  child: ListTile(
                     leading: const Icon(
-                      Icons.construction,
+                      Icons.inventory_2,
                       color: Colors.white,
                     ),
-                    title: const Text("Obras",
+                    tileColor: const Color(0xff8c8c94),
+                    title: const Text('Materiales',
                         style: TextStyle(fontSize: 15, color: Colors.white)),
-                    children: <Widget>[
-                      Padding(
-                        padding: const EdgeInsets.only(left: 15.0),
-                        child: ListTile(
-                          leading: const Icon(
-                            Icons.handyman,
-                            color: Colors.white,
-                          ),
-                          tileColor: const Color(0xff8c8c94),
-                          title: const Text('Obras en curso',
-                              style:
-                                  TextStyle(fontSize: 15, color: Colors.white)),
-                          onTap: () async {},
-                        ),
-                      ),
-                    ],
+                    onTap: () async {},
                   ),
                 ),
               ],
@@ -223,11 +215,6 @@ class _HomeScreenState extends State<HomeScreen> {
     await prefs.setBool('isRemembered', false);
     await prefs.setString('userBody', '');
     await prefs.setString('date', '');
-
-    //------------ Guarda en WebSesion la fecha y hora de salida ----------
-    _nroConexion = prefs.getInt('nroConexion');
-
-    var connectivityResult = await Connectivity().checkConnectivity();
 
     Navigator.pushReplacement(
         context, MaterialPageRoute(builder: (context) => const LoginScreen()));
