@@ -37,6 +37,7 @@ class User {
   String? firmaUsuario = '';
   String? firmaUsuarioImageFullPath = '';
   String? appIMEI = '';
+  int? habilitaInstalacionesAPP = 0;
 
   User(
       {required this.idUsuario,
@@ -76,7 +77,8 @@ class User {
       required this.rubro,
       required this.firmaUsuario,
       required this.firmaUsuarioImageFullPath,
-      required this.appIMEI});
+      required this.appIMEI,
+      required this.habilitaInstalacionesAPP});
 
   User.fromJson(Map<String, dynamic> json) {
     idUsuario = json['idUsuario'];
@@ -117,6 +119,7 @@ class User {
     firmaUsuario = json['firmaUsuario'];
     firmaUsuarioImageFullPath = json['firmaUsuarioImageFullPath'];
     appIMEI = json['appIMEI'];
+    habilitaInstalacionesAPP = json['habilitaInstalacionesAPP'];
   }
 
   Map<String, dynamic> toJson() {
@@ -159,6 +162,7 @@ class User {
     data['firmaUsuario'] = firmaUsuario;
     data['firmaUsuarioImageFullPath'] = firmaUsuarioImageFullPath;
     data['appIMEI'] = appIMEI;
+    data['habilitaInstalacionesAPP'] = habilitaInstalacionesAPP;
     return data;
   }
 }

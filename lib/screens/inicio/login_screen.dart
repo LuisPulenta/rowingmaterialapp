@@ -1,8 +1,11 @@
 import 'dart:convert';
 import 'package:adaptive_dialog/adaptive_dialog.dart';
 import 'package:connectivity/connectivity.dart';
+import 'package:device_information/device_information.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:http/http.dart' as http;
+import 'package:permission_handler/permission_handler.dart';
 import 'package:rowingmaterialapp/helpers/constants.dart';
 import 'package:rowingmaterialapp/components/loader_component.dart';
 import 'package:rowingmaterialapp/models/models.dart';
@@ -37,6 +40,8 @@ class _LoginScreenState extends State<LoginScreen> {
   bool _passwordShow = false;
   bool _showLoader = false;
 
+  String _imeiNo = "";
+
 //---------------------------------------------------------------
 //----------------------- initState -----------------------------
 //---------------------------------------------------------------
@@ -44,6 +49,7 @@ class _LoginScreenState extends State<LoginScreen> {
   @override
   void initState() {
     super.initState();
+    initPlatformState();
     setState(() {});
   }
 
@@ -358,6 +364,7 @@ class _LoginScreenState extends State<LoginScreen> {
           MaterialPageRoute(
               builder: (context) => HomeScreen(
                     user: user,
+                    imei: _imeiNo,
                   )));
     }
   }
@@ -399,5 +406,66 @@ class _LoginScreenState extends State<LoginScreen> {
     await prefs.setBool('isRemembered', true);
     await prefs.setString('userBody', body);
     await prefs.setString('date', DateTime.now().toString());
+  }
+
+  //----------------------------------------------------------
+//--------------------- initPlatformState ------------------
+//----------------------------------------------------------
+
+  Future<void> initPlatformState() async {
+    late String imeiNo = '';
+
+    // Platform messages may fail,
+    // so we use a try/catch PlatformException.
+
+    var status = await Permission.phone.status;
+
+    if (status.isDenied) {
+      await showDialog(
+          context: context,
+          builder: (context) {
+            return AlertDialog(
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(10),
+              ),
+              title: const Text('Aviso'),
+              content: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisSize: MainAxisSize.min,
+                  children: const <Widget>[
+                    Text('''
+                        Debe habilitar los permisos:
+                        - Almacenamiento
+                        - Cámara
+                        - Teléfono
+                        - Ubicación
+                        '''),
+                    SizedBox(
+                      height: 10,
+                    ),
+                  ]),
+              actions: <Widget>[
+                TextButton(
+                    onPressed: () => Navigator.of(context).pop(),
+                    child: const Text('Ok')),
+              ],
+            );
+          });
+      openAppSettings();
+      //exit(0);
+    }
+
+    try {
+      imeiNo = await DeviceInformation.deviceIMEINumber;
+    } on PlatformException catch (e) {}
+
+    // If the widget was removed from the tree while the asynchronous platform
+    // message was in flight, we want to discard the reply rather than calling
+    // setState to update our non-existent appearance.
+    if (!mounted) return;
+
+    setState(() {
+      _imeiNo = imeiNo;
+    });
   }
 }

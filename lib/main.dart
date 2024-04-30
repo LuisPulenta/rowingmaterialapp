@@ -57,9 +57,10 @@ class _MyAppState extends State<MyApp> {
       home: _isLoading
           ? const WaitScreen()
           : _showLoginPage
-              ? const LoadingScreen()
+              ? const LoginScreen()
               : HomeScreen(
                   user: _user,
+                  imei: "",
                 ),
     );
   }
