@@ -55,6 +55,8 @@ dependencies:
   geocoding: ^2.0.1               # Para direccion de una latitud y longitud
   permission_handler: ^10.2.0
   device_information: ^0.0.4
+  syncfusion_flutter_signaturepad: ^19.4.48
+  flutter_barcode_scanner: ^2.0.0
   
 
 flutter_icons:
