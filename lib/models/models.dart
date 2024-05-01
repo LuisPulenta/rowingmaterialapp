@@ -1,2 +1,3 @@
 export 'package:rowingmaterialapp/models/response.dart';
 export 'package:rowingmaterialapp/models/user.dart';
+export 'package:rowingmaterialapp/models/tipo_instalacion.dart';

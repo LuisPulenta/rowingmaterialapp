@@ -44,6 +44,26 @@ class ApiHelper {
   }
 
 //---------------------------------------------------------------------------
+  static Future<Response> postNoToken(
+      String controller, Map<String, dynamic> request) async {
+    var url = Uri.parse('${Constants.apiUrl}$controller');
+    var response = await http.post(
+      url,
+      headers: {
+        'content-type': 'application/json',
+        'accept': 'application/json',
+      },
+      body: jsonEncode(request),
+    );
+
+    if (response.statusCode >= 400) {
+      return Response(isSuccess: false, message: response.body);
+    }
+
+    return Response(isSuccess: true);
+  }
+
+//---------------------------------------------------------------------------
   static Future<Response> delete(String controller, String id) async {
     var url = Uri.parse('${Constants.apiUrl}$controller$id');
     var response = await http.delete(
