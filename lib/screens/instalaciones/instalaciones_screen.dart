@@ -1,18 +1,12 @@
 import 'package:flutter/material.dart';
-import 'package:geolocator/geolocator.dart';
 import 'package:rowingmaterialapp/models/models.dart';
 import 'package:rowingmaterialapp/screens/screens.dart';
 
 class InstalacionesScreen extends StatefulWidget {
   final User user;
-  final Position positionUser;
   final String imei;
 
-  const InstalacionesScreen(
-      {Key? key,
-      required this.user,
-      required this.positionUser,
-      required this.imei})
+  const InstalacionesScreen({Key? key, required this.user, required this.imei})
       : super(key: key);
 
   @override
@@ -89,7 +83,6 @@ class _InstalacionesScreenState extends State<InstalacionesScreen> {
       MaterialPageRoute(
         builder: (context) => InstalacionNuevaScreen(
           user: widget.user,
-          positionUser: widget.positionUser,
           imei: widget.imei,
           // imei: widget.imei,
         ),

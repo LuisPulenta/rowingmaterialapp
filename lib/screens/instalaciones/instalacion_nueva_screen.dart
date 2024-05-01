@@ -8,17 +8,15 @@ import 'package:rowingmaterialapp/components/loader_component.dart';
 import 'package:rowingmaterialapp/helpers/helpers.dart';
 import 'package:rowingmaterialapp/models/models.dart';
 import 'package:rowingmaterialapp/screens/screens.dart';
+import 'package:geocoding/geocoding.dart';
+import 'package:rowingmaterialapp/widgets/widgets.dart';
 
 class InstalacionNuevaScreen extends StatefulWidget {
   final User user;
-  final Position positionUser;
   final String imei;
 
   const InstalacionNuevaScreen(
-      {Key? key,
-      required this.user,
-      required this.positionUser,
-      required this.imei})
+      {Key? key, required this.user, required this.imei})
       : super(key: key);
 
   @override
@@ -37,22 +35,22 @@ class _InstalacionNuevaScreenState extends State<InstalacionNuevaScreen> {
   String _document = '';
   String _documentError = '';
   bool _documentShowError = false;
-  final TextEditingController _documentController = TextEditingController();
+  TextEditingController _documentController = TextEditingController();
 
   String _firstname = '';
   String _firstnameError = '';
   bool _firstnameShowError = false;
-  final TextEditingController _firstnameController = TextEditingController();
+  TextEditingController _firstnameController = TextEditingController();
 
   String _lastname = '';
   String _lastnameError = '';
   bool _lastnameShowError = false;
-  final TextEditingController _lastnameController = TextEditingController();
+  TextEditingController _lastnameController = TextEditingController();
 
   String _signname = '';
   String _signnameError = '';
   bool _signnameShowError = false;
-  final TextEditingController _signnameController = TextEditingController();
+  TextEditingController _signnameController = TextEditingController();
 
   DateTime? fechaInstalacion;
 
@@ -65,14 +63,28 @@ class _InstalacionNuevaScreenState extends State<InstalacionNuevaScreen> {
   String _pedido = '';
   String _pedidoError = '';
   bool _pedidoShowError = false;
-  final TextEditingController _pedidoController = TextEditingController();
+  TextEditingController _pedidoController = TextEditingController();
 
   String _entrecalles = '';
   String _entrecallesError = '';
   bool _entrecallesShowError = false;
-  final TextEditingController _entrecallesController = TextEditingController();
+  TextEditingController _entrecallesController = TextEditingController();
 
   bool _esAveria = false;
+
+  Position _positionUser = const Position(
+      longitude: 0,
+      latitude: 0,
+      timestamp: null,
+      accuracy: 0,
+      altitude: 0,
+      heading: 0,
+      speed: 0,
+      altitudeAccuracy: 0,
+      headingAccuracy: 0,
+      speedAccuracy: 0);
+
+  String direccion = '';
 
 //---------------------------------------------------------------
 //----------------------- initState -----------------------------
@@ -131,7 +143,7 @@ class _InstalacionNuevaScreenState extends State<InstalacionNuevaScreen> {
               child: Align(
                 alignment: Alignment.centerLeft,
                 child: Text(
-                  "Lat-Long:: ${widget.positionUser.latitude} - ${widget.positionUser.longitude}",
+                  "Lat-Long: ${_positionUser.latitude} / ${_positionUser.longitude}",
                 ),
               ),
             ),
@@ -153,17 +165,46 @@ class _InstalacionNuevaScreenState extends State<InstalacionNuevaScreen> {
                 ),
               ),
             ),
-
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceAround,
+              children: const [
+                Titulo(
+                  texto: "DATOS CLIENTE",
+                  color: Color.fromARGB(255, 10, 226, 250),
+                ),
+              ],
+            ),
             _showDocument(),
             _showFirstName(),
             _showLastName(),
+            const Divider(
+              color: Colors.black,
+            ),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceAround,
+              children: const [
+                Titulo(
+                  texto: "DATOS INSTALACION",
+                  color: Color.fromARGB(255, 10, 226, 250),
+                ),
+              ],
+            ),
+            _showTiposInstalacion(),
             _showFechaInstalacion(),
             _showPedido(),
             _showEntrecalles(),
             _showAveria(),
-
-            const SizedBox(
-              height: 10,
+            const Divider(
+              color: Colors.black,
+            ),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceAround,
+              children: const [
+                Titulo(
+                  texto: "CONFORMIDAD CLIENTE",
+                  color: Color.fromARGB(255, 10, 226, 250),
+                ),
+              ],
             ),
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceAround,
@@ -177,11 +218,13 @@ class _InstalacionNuevaScreenState extends State<InstalacionNuevaScreen> {
             ),
             _showButtonsFirma(ancho),
             _showSignName(),
-            _showTiposInstalacion(),
-            // _showDomicilio(),
-            // _showEntrecalles1(),
-            // _showTelefono(),
+            const Divider(
+              color: Colors.black,
+            ),
             _showButton(),
+            const SizedBox(
+              height: 25,
+            ),
             Center(
               child: _showLoader
                   ? LoaderComponent(text: _textComponent)
@@ -824,6 +867,7 @@ class _InstalacionNuevaScreenState extends State<InstalacionNuevaScreen> {
       TipoInstalacion(tipoinstalacion: 'IPTV'),
       TipoInstalacion(tipoinstalacion: 'Otro'),
     ];
+    await _getPosition();
     setState(() {});
   }
 
@@ -885,5 +929,83 @@ class _InstalacionNuevaScreenState extends State<InstalacionNuevaScreen> {
         ],
       ),
     );
+  }
+
+  //-----------------------------------------------------------------
+//--------------------- _getPosition ------------------------------
+//-----------------------------------------------------------------
+
+  Future _getPosition() async {
+    LocationPermission permission;
+    permission = await Geolocator.checkPermission();
+    if (permission == LocationPermission.denied) {
+      permission = await Geolocator.requestPermission();
+      if (permission == LocationPermission.denied) {
+        showDialog(
+            context: context,
+            builder: (context) {
+              return AlertDialog(
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(10),
+                ),
+                title: const Text('Aviso'),
+                content: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: const <Widget>[
+                      Text('El permiso de localización está negado.'),
+                      SizedBox(
+                        height: 10,
+                      ),
+                    ]),
+                actions: <Widget>[
+                  TextButton(
+                      onPressed: () => Navigator.of(context).pop(),
+                      child: const Text('Ok')),
+                ],
+              );
+            });
+        return;
+      }
+    }
+
+    if (permission == LocationPermission.deniedForever) {
+      showDialog(
+          context: context,
+          builder: (context) {
+            return AlertDialog(
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(10),
+              ),
+              title: const Text('Aviso'),
+              content: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: const <Widget>[
+                    Text(
+                        'El permiso de localización está negado permanentemente. No se puede requerir este permiso.'),
+                    SizedBox(
+                      height: 10,
+                    ),
+                  ]),
+              actions: <Widget>[
+                TextButton(
+                    onPressed: () => Navigator.of(context).pop(),
+                    child: const Text('Ok')),
+              ],
+            );
+          });
+      return;
+    }
+
+    var connectivityResult = await Connectivity().checkConnectivity();
+
+    if (connectivityResult != ConnectivityResult.none) {
+      _positionUser = await Geolocator.getCurrentPosition(
+          desiredAccuracy: LocationAccuracy.high);
+
+      List<Placemark> placemarks = await placemarkFromCoordinates(
+          _positionUser.latitude, _positionUser.longitude);
+      direccion =
+          "${placemarks[0].street} - ${placemarks[0].locality} - ${placemarks[0].country}";
+    }
   }
 }

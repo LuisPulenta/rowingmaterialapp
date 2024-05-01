@@ -1,7 +1,4 @@
-import 'package:connectivity/connectivity.dart';
 import 'package:flutter/material.dart';
-import 'package:geocoding/geocoding.dart';
-import 'package:geolocator/geolocator.dart';
 import 'package:rowingmaterialapp/models/models.dart';
 import 'package:rowingmaterialapp/screens/screens.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -24,20 +21,6 @@ class _HomeScreenState extends State<HomeScreen> {
 //----------------------- Variables -----------------------------
 //---------------------------------------------------------------
 
-  String direccion = '';
-
-  Position _positionUser = Position(
-      longitude: 0,
-      latitude: 0,
-      timestamp: null,
-      accuracy: 0,
-      altitude: 0,
-      heading: 0,
-      speed: 0,
-      altitudeAccuracy: 0,
-      headingAccuracy: 0,
-      speedAccuracy: 0);
-
   //---------------------------------------------------------------
 //----------------------- initState -----------------------------
 //---------------------------------------------------------------
@@ -45,7 +28,6 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   void initState() {
     super.initState();
-    _getPosition();
   }
 
 //---------------------------------------------------------------
@@ -129,7 +111,6 @@ class _HomeScreenState extends State<HomeScreen> {
                             MaterialPageRoute(
                               builder: (context) => InstalacionesScreen(
                                 user: widget.user,
-                                positionUser: _positionUser,
                                 imei: widget.imei,
                               ),
                             ),
@@ -227,86 +208,5 @@ class _HomeScreenState extends State<HomeScreen> {
 
     Navigator.pushReplacement(
         context, MaterialPageRoute(builder: (context) => const LoginScreen()));
-  }
-
-//-----------------------------------------------------------------
-//--------------------- _getPosition ------------------------------
-//-----------------------------------------------------------------
-
-  Future _getPosition() async {
-    LocationPermission permission;
-    permission = await Geolocator.checkPermission();
-    if (permission == LocationPermission.denied) {
-      permission = await Geolocator.requestPermission();
-      if (permission == LocationPermission.denied) {
-        showDialog(
-            context: context,
-            builder: (context) {
-              return AlertDialog(
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(10),
-                ),
-                title: const Text('Aviso'),
-                content: Column(
-                    mainAxisSize: MainAxisSize.min,
-                    children: const <Widget>[
-                      Text('El permiso de localización está negado.'),
-                      SizedBox(
-                        height: 10,
-                      ),
-                    ]),
-                actions: <Widget>[
-                  TextButton(
-                      onPressed: () => Navigator.of(context).pop(),
-                      child: const Text('Ok')),
-                ],
-              );
-            });
-        return;
-      }
-    }
-
-    if (permission == LocationPermission.deniedForever) {
-      showDialog(
-          context: context,
-          builder: (context) {
-            return AlertDialog(
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(10),
-              ),
-              title: const Text('Aviso'),
-              content: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: const <Widget>[
-                    Text(
-                        'El permiso de localización está negado permanentemente. No se puede requerir este permiso.'),
-                    SizedBox(
-                      height: 10,
-                    ),
-                  ]),
-              actions: <Widget>[
-                TextButton(
-                    onPressed: () => Navigator.of(context).pop(),
-                    child: const Text('Ok')),
-              ],
-            );
-          });
-      return;
-    }
-
-    var connectivityResult = await Connectivity().checkConnectivity();
-
-    if (connectivityResult != ConnectivityResult.none) {
-      _positionUser = await Geolocator.getCurrentPosition(
-          desiredAccuracy: LocationAccuracy.high);
-
-      List<Placemark> placemarks = await placemarkFromCoordinates(
-          _positionUser.latitude, _positionUser.longitude);
-      direccion = placemarks[0].street.toString() +
-          " - " +
-          placemarks[0].locality.toString() +
-          " - " +
-          placemarks[0].country.toString();
-    }
   }
 }
