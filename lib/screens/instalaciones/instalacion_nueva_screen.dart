@@ -16,9 +16,15 @@ import 'package:rowingmaterialapp/widgets/widgets.dart';
 class InstalacionNuevaScreen extends StatefulWidget {
   final User user;
   final String imei;
+  final bool editMode;
+  final Instalacion instalacion;
 
   const InstalacionNuevaScreen(
-      {Key? key, required this.user, required this.imei})
+      {Key? key,
+      required this.user,
+      required this.imei,
+      required this.editMode,
+      required this.instalacion})
       : super(key: key);
 
   @override
@@ -33,6 +39,9 @@ class _InstalacionNuevaScreenState extends State<InstalacionNuevaScreen> {
   final String _textComponent = 'Por favor espere...';
   bool _signatureChanged = false;
   late ByteData? _signature;
+
+  String _latitud = '';
+  String _longitud = '';
 
   String _document = '';
   String _documentError = '';
@@ -79,7 +88,7 @@ class _InstalacionNuevaScreenState extends State<InstalacionNuevaScreen> {
 
   bool _esAveria = false;
 
-  Position _positionUser = const Position(
+  Position _positionUser = Position(
       longitude: 0,
       latitude: 0,
       timestamp: null,
@@ -100,6 +109,7 @@ class _InstalacionNuevaScreenState extends State<InstalacionNuevaScreen> {
   @override
   void initState() {
     super.initState();
+    _signature = null;
     _loadData();
   }
 
@@ -111,7 +121,9 @@ class _InstalacionNuevaScreenState extends State<InstalacionNuevaScreen> {
     double ancho = MediaQuery.of(context).size.width;
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Nueva Instalación'),
+        title: (widget.editMode)
+            ? const Text('Editar Instalación')
+            : const Text('Nueva Instalación'),
         centerTitle: true,
       ),
       body: SingleChildScrollView(
@@ -174,6 +186,9 @@ class _InstalacionNuevaScreenState extends State<InstalacionNuevaScreen> {
                   color: Color.fromARGB(255, 10, 226, 250),
                 ),
               ],
+            ),
+            const SizedBox(
+              height: 5,
             ),
             _showDocument(),
             _showFirstName(),
@@ -413,7 +428,6 @@ class _InstalacionNuevaScreenState extends State<InstalacionNuevaScreen> {
           Expanded(
             child: TextField(
               controller: _addressController,
-              keyboardType: TextInputType.number,
               decoration: InputDecoration(
                   fillColor: _address == "" ? Colors.yellow[200] : Colors.white,
                   filled: true,
@@ -454,11 +468,11 @@ class _InstalacionNuevaScreenState extends State<InstalacionNuevaScreen> {
   Widget _showLatLong() {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 5),
-      child: _positionUser.latitude != 0
+      child: _latitud != ''
           ? Align(
               alignment: Alignment.centerLeft,
               child: Text(
-                "Lat-Long: ${_positionUser.latitude} / ${_positionUser.longitude}",
+                "Lat-Long: $_latitud / $_longitud",
               ),
             )
           : Container(),
@@ -653,17 +667,33 @@ class _InstalacionNuevaScreenState extends State<InstalacionNuevaScreen> {
             children: [
               InkWell(
                 onTap: () => _takeSignature(),
-                child: Container(
-                  child: !_signatureChanged
-                      ? Image(
-                          image: const AssetImage('assets/firma.png'),
-                          width: ancho * 0.7,
-                          fit: BoxFit.contain)
-                      : Image.memory(
-                          _signature!.buffer.asUint8List(),
-                          width: ancho * 0.7,
-                        ),
-                ),
+                child: !widget.editMode
+                    ? Container(
+                        child: !_signatureChanged
+                            ? Image(
+                                image: const AssetImage('assets/firma.png'),
+                                width: ancho * 0.7,
+                                fit: BoxFit.contain)
+                            : Image.memory(
+                                _signature!.buffer.asUint8List(),
+                                width: ancho * 0.7,
+                              ),
+                      )
+                    : SizedBox(
+                        width: ancho * 0.7,
+                        child: !_signatureChanged
+                            ? FadeInImage(
+                                fit: BoxFit.contain,
+                                placeholder:
+                                    const AssetImage('assets/loading.gif'),
+                                image: NetworkImage(widget
+                                    .instalacion.firmaclienteImageFullPath),
+                              )
+                            : Image.memory(
+                                _signature!.buffer.asUint8List(),
+                                width: ancho * 0.7,
+                              ),
+                      ),
               ),
               const SizedBox(
                 width: 10,
@@ -815,6 +845,22 @@ class _InstalacionNuevaScreenState extends State<InstalacionNuevaScreen> {
       _lastnameShowError = false;
     }
 
+    if (_address == "") {
+      isValid = false;
+      _addressShowError = true;
+      _addressError = 'Ingrese un Domicilio';
+    } else {
+      _addressShowError = false;
+    }
+
+    if (_latitud == '' || _longitud == '') {
+      isValid = false;
+      _addressShowError = true;
+      _addressError = 'Ingrese un Domicilio georeferenciado';
+    } else {
+      _addressShowError = false;
+    }
+
     if (fechaInstalacion == null) {
       isValid = false;
       showDialog(
@@ -858,6 +904,41 @@ class _InstalacionNuevaScreenState extends State<InstalacionNuevaScreen> {
       _pedidoShowError = false;
     }
 
+    if (_pedido.length > 11) {
+      isValid = false;
+      _pedidoShowError = true;
+      _pedidoError = 'Pedido no puede contener más de 11 caracteres';
+    } else {
+      _pedidoShowError = false;
+    }
+
+    if (_signature == null && !widget.editMode) {
+      isValid = false;
+      showDialog(
+          context: context,
+          builder: (context) {
+            return AlertDialog(
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(10),
+              ),
+              title: const Text('Aviso!'),
+              content: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: const <Widget>[
+                    Text('Debe haber firma del cliente.'),
+                    SizedBox(
+                      height: 10,
+                    ),
+                  ]),
+              actions: <Widget>[
+                TextButton(
+                    onPressed: () => Navigator.of(context).pop(),
+                    child: const Text('Ok')),
+              ],
+            );
+          });
+    }
+
     setState(() {});
 
     return isValid;
@@ -894,16 +975,14 @@ class _InstalacionNuevaScreenState extends State<InstalacionNuevaScreen> {
       return;
     }
 
-    String ahora = DateTime.now().toString();
-
     Map<String, dynamic> request = {
-      //'nroregistro': _ticket.nroregistro,
+      'IDRegistro': widget.editMode ? widget.instalacion.idRegistro : 0,
       'NroObra': 2,
       'IdUsuario': widget.user.idUsuario,
       'Imei': widget.imei,
       'Fecha': DateTime.now().toString(),
-      'Latitud': _positionUser.latitude.toString(),
-      'Longitud': _positionUser.longitude.toString(),
+      'Latitud': _latitud,
+      'Longitud': _longitud,
       'FechaInstalacion': fechaInstalacion.toString(),
       'Grupo': widget.user.grupo,
       'Causante': widget.user.codigoCausante,
@@ -920,23 +999,36 @@ class _InstalacionNuevaScreenState extends State<InstalacionNuevaScreen> {
       'Auditado': 0,
     };
 
-    Response response = await ApiHelper.postNoToken(
-        '/api/AppInstalacionesEquipo/PostAppInstalacionesEquipo', request);
-
+    if (!widget.editMode) {
+      Response response = await ApiHelper.postNoToken(
+          '/api/AppInstalacionesEquipo/PostAppInstalacionesEquipo', request);
+      if (!response.isSuccess) {
+        await showAlertDialog(
+            context: context,
+            title: 'Error',
+            message: response.message,
+            actions: <AlertDialogAction>[
+              const AlertDialogAction(key: null, label: 'Aceptar'),
+            ]);
+        return;
+      }
+    } else {
+      Response response = await ApiHelper.put('/api/AppInstalacionesEquipo/',
+          widget.instalacion.idRegistro.toString(), request);
+      if (!response.isSuccess) {
+        await showAlertDialog(
+            context: context,
+            title: 'Error',
+            message: response.message,
+            actions: <AlertDialogAction>[
+              const AlertDialogAction(key: null, label: 'Aceptar'),
+            ]);
+        return;
+      }
+    }
     setState(() {
       _showLoader = false;
     });
-
-    if (!response.isSuccess) {
-      await showAlertDialog(
-          context: context,
-          title: 'Error',
-          message: response.message,
-          actions: <AlertDialogAction>[
-            const AlertDialogAction(key: null, label: 'Aceptar'),
-          ]);
-      return;
-    }
     Navigator.pop(context, 'yes');
   }
 
@@ -991,7 +1083,11 @@ class _InstalacionNuevaScreenState extends State<InstalacionNuevaScreen> {
       TipoInstalacion(tipoinstalacion: 'Otro'),
     ];
 
-    setState(() {});
+    if (widget.editMode) {
+      await _loadFields();
+    } else {
+      setState(() {});
+    }
   }
 
 //-----------------------------------------------------------------
@@ -1095,12 +1191,53 @@ class _InstalacionNuevaScreenState extends State<InstalacionNuevaScreen> {
       _positionUser = await Geolocator.getCurrentPosition(
           desiredAccuracy: LocationAccuracy.high);
 
+      _latitud = _positionUser.latitude.toString();
+      _longitud = _positionUser.longitude.toString();
+
       List<Placemark> placemarks = await placemarkFromCoordinates(
           _positionUser.latitude, _positionUser.longitude);
       _address = "${placemarks[0].street} - ${placemarks[0].locality}";
 
       _addressController.text = _address;
     }
+    setState(() {});
+  }
+
+//-------------------------------------------------------------
+//-------------------- _loadFields ----------------------------
+//-------------------------------------------------------------
+
+  _loadFields() async {
+    _document = widget.instalacion.documento;
+    _documentController.text = widget.instalacion.documento;
+
+    _firstname = widget.instalacion.nombreCliente;
+    _firstnameController.text = widget.instalacion.nombreCliente;
+
+    _lastname = widget.instalacion.apellidoCliente;
+    _lastnameController.text = widget.instalacion.apellidoCliente;
+
+    _address = widget.instalacion.domicilioInstalacion;
+    _addressController.text = widget.instalacion.domicilioInstalacion;
+
+    _latitud = widget.instalacion.latitud;
+    _longitud = widget.instalacion.longitud;
+
+    _entrecalles = widget.instalacion.entreCalles;
+    _entrecallesController.text = widget.instalacion.entreCalles;
+
+    _tipoinstalacion = widget.instalacion.tipoInstalacion;
+
+    fechaInstalacion = DateTime.parse(widget.instalacion.fechaInstalacion!);
+
+    _pedido = widget.instalacion.pedido;
+    _pedidoController.text = widget.instalacion.pedido;
+
+    _esAveria = widget.instalacion.esAveria == "SI" ? true : false;
+
+    _signname = widget.instalacion.nombreApellidoFirmante;
+    _signnameController.text = widget.instalacion.nombreApellidoFirmante;
+
     setState(() {});
   }
 }

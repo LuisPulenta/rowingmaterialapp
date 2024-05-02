@@ -4,7 +4,7 @@ class Instalacion {
   int idUsuario = 0;
   String? imei = '';
   String? fecha = '';
-  String? latitud = '';
+  String latitud = '';
   String longitud = '';
   String? fechaInstalacion = '';
   String grupo = '';

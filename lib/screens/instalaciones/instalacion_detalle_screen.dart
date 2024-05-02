@@ -28,7 +28,6 @@ class _InstalacionDetalleScreenState extends State<InstalacionDetalleScreen> {
 //---------------------------------------------------------------
   @override
   Widget build(BuildContext context) {
-    double ancho = MediaQuery.of(context).size.width;
     return Scaffold(
       appBar: AppBar(
         title: Text('Instalación ${widget.instalacion.idRegistro.toString()}'),
@@ -119,6 +118,14 @@ class _InstalacionDetalleScreenState extends State<InstalacionDetalleScreen> {
         children: <Widget>[
           Expanded(
             child: ElevatedButton(
+              style: ElevatedButton.styleFrom(
+                backgroundColor: const Color(0xFF781f1e),
+                minimumSize: const Size(double.infinity, 50),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(5),
+                ),
+              ),
+              onPressed: _volver,
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: const [
@@ -129,14 +136,6 @@ class _InstalacionDetalleScreenState extends State<InstalacionDetalleScreen> {
                   Text('Volver'),
                 ],
               ),
-              style: ElevatedButton.styleFrom(
-                backgroundColor: const Color(0xFF781f1e),
-                minimumSize: const Size(double.infinity, 50),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(5),
-                ),
-              ),
-              onPressed: _volver,
             ),
           ),
         ],

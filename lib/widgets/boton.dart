@@ -8,7 +8,8 @@ class Boton extends StatelessWidget {
   final Color color2;
 
   const Boton(
-      {this.icon = FontAwesomeIcons.plus,
+      {super.key,
+      this.icon = FontAwesomeIcons.plus,
       required this.texto,
       this.color1 = const Color(0xff6989f5),
       this.color2 = const Color(0xff906ef5)});

@@ -36,7 +36,7 @@ class CustomRow extends StatelessWidget {
           const SizedBox(
             width: 15,
           ),
-          Container(
+          SizedBox(
             width: ancho * 0.3,
             child: Text(
               nombredato,

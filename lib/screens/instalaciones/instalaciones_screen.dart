@@ -365,7 +365,7 @@ class _InstalacionesScreenState extends State<InstalacionesScreen> {
                                       size: 24, color: Colors.white),
                                 ),
                                 onPressed: () async {
-                                  //_editInstalacion(e);
+                                  _editInstalacion(e);
                                 },
                               )
                             : Container(),
@@ -438,7 +438,30 @@ class _InstalacionesScreenState extends State<InstalacionesScreen> {
         builder: (context) => InstalacionNuevaScreen(
           user: widget.user,
           imei: widget.imei,
-          // imei: widget.imei,
+          editMode: false,
+          instalacion: Instalacion(
+              idRegistro: 0,
+              nroObra: 0,
+              idUsuario: 0,
+              imei: '',
+              fecha: '',
+              latitud: '',
+              longitud: '',
+              fechaInstalacion: '',
+              grupo: '',
+              causante: '',
+              pedido: '',
+              nombreCliente: '',
+              apellidoCliente: '',
+              documento: '',
+              domicilioInstalacion: '',
+              entreCalles: '',
+              firmacliente: '',
+              nombreApellidoFirmante: '',
+              tipoInstalacion: '',
+              esAveria: '',
+              auditado: 0,
+              firmaclienteImageFullPath: ''),
         ),
       ),
     );
@@ -561,5 +584,25 @@ class _InstalacionesScreenState extends State<InstalacionesScreen> {
             ],
           );
         });
+  }
+
+//---------------------------------------------------------------
+//----------------- _editInstalacion ----------------------------
+//---------------------------------------------------------------
+
+  void _editInstalacion(Instalacion e) async {
+    String? result = await Navigator.push(
+        context,
+        MaterialPageRoute(
+            builder: (context) => InstalacionNuevaScreen(
+                  user: widget.user,
+                  imei: widget.imei,
+                  editMode: true,
+                  instalacion: e,
+                )));
+    if (result == 'yes' || result != 'yes') {
+      _getInstalaciones();
+      setState(() {});
+    }
   }
 }
