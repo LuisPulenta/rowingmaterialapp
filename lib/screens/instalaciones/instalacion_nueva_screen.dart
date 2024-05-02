@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:adaptive_dialog/adaptive_dialog.dart';
 import 'package:connectivity/connectivity.dart';
 import 'package:flutter/material.dart';
@@ -46,6 +48,11 @@ class _InstalacionNuevaScreenState extends State<InstalacionNuevaScreen> {
   String _lastnameError = '';
   bool _lastnameShowError = false;
   TextEditingController _lastnameController = TextEditingController();
+
+  String _address = '';
+  String _addressError = '';
+  bool _addressShowError = false;
+  TextEditingController _addressController = TextEditingController();
 
   String _signname = '';
   String _signnameError = '';
@@ -111,59 +118,53 @@ class _InstalacionNuevaScreenState extends State<InstalacionNuevaScreen> {
         physics: const BouncingScrollPhysics(),
         child: Column(
           children: <Widget>[
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 5),
-              child: Align(
-                alignment: Alignment.centerLeft,
-                child: Text(
-                  "IDUsuario: ${widget.user.idUsuario}",
-                ),
-              ),
-            ),
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 5),
-              child: Align(
-                alignment: Alignment.centerLeft,
-                child: Text(
-                  "Imei: ${widget.imei}",
-                ),
-              ),
-            ),
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 5),
-              child: Align(
-                alignment: Alignment.centerLeft,
-                child: Text(
-                  "Fecha y Hora de carga: ${DateTime.now().toString()}",
-                ),
-              ),
-            ),
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 5),
-              child: Align(
-                alignment: Alignment.centerLeft,
-                child: Text(
-                  "Lat-Long: ${_positionUser.latitude} / ${_positionUser.longitude}",
-                ),
-              ),
-            ),
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 5),
-              child: Align(
-                alignment: Alignment.centerLeft,
-                child: Text(
-                  "Grupo: ${widget.user.grupo}",
-                ),
-              ),
-            ),
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 5),
-              child: Align(
-                alignment: Alignment.centerLeft,
-                child: Text(
-                  "Causante: ${widget.user.codigoCausante}",
-                ),
-              ),
+            // Padding(
+            //   padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 5),
+            //   child: Align(
+            //     alignment: Alignment.centerLeft,
+            //     child: Text(
+            //       "IDUsuario: ${widget.user.idUsuario}",
+            //     ),
+            //   ),
+            // ),
+            // Padding(
+            //   padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 5),
+            //   child: Align(
+            //     alignment: Alignment.centerLeft,
+            //     child: Text(
+            //       "Imei: ${widget.imei}",
+            //     ),
+            //   ),
+            // ),
+            // Padding(
+            //   padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 5),
+            //   child: Align(
+            //     alignment: Alignment.centerLeft,
+            //     child: Text(
+            //       "Fecha y Hora de carga: ${DateTime.now().toString()}",
+            //     ),
+            //   ),
+            // ),
+            // Padding(
+            //   padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 5),
+            //   child: Align(
+            //     alignment: Alignment.centerLeft,
+            //     child: Text(
+            //       "Grupo: ${widget.user.grupo}",
+            //     ),
+            //   ),
+            // ),
+            // Padding(
+            //   padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 5),
+            //   child: Align(
+            //     alignment: Alignment.centerLeft,
+            //     child: Text(
+            //       "Causante: ${widget.user.codigoCausante}",
+            //     ),
+            //   ),
+            // ),
+            const SizedBox(
+              height: 15,
             ),
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceAround,
@@ -177,6 +178,9 @@ class _InstalacionNuevaScreenState extends State<InstalacionNuevaScreen> {
             _showDocument(),
             _showFirstName(),
             _showLastName(),
+            _showAddress(),
+            _showLatLong(),
+            _showEntrecalles(),
             const Divider(
               color: Colors.black,
             ),
@@ -192,7 +196,6 @@ class _InstalacionNuevaScreenState extends State<InstalacionNuevaScreen> {
             _showTiposInstalacion(),
             _showFechaInstalacion(),
             _showPedido(),
-            _showEntrecalles(),
             _showAveria(),
             const Divider(
               color: Colors.black,
@@ -234,79 +237,6 @@ class _InstalacionNuevaScreenState extends State<InstalacionNuevaScreen> {
         ),
       ),
     );
-  }
-
-//--------------------------------------------------------------
-//-------------------------- _showButtonsFirma -----------------
-//--------------------------------------------------------------
-
-  Widget _showButtonsFirma(ancho) {
-    double ancho = MediaQuery.of(context).size.width;
-    return Container(
-      margin: const EdgeInsets.only(left: 5, right: 5, top: 5),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: <Widget>[
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              InkWell(
-                onTap: () => _takeSignature(),
-                child: Container(
-                  child: !_signatureChanged
-                      ? Image(
-                          image: const AssetImage('assets/firma.png'),
-                          width: ancho * 0.7,
-                          fit: BoxFit.contain)
-                      : Image.memory(
-                          _signature!.buffer.asUint8List(),
-                          width: ancho * 0.7,
-                        ),
-                ),
-              ),
-              const SizedBox(
-                width: 10,
-              ),
-              // InkWell(
-              //   onTap: () => _takeSignature(),
-              //   child: ClipRRect(
-              //     borderRadius: BorderRadius.circular(30),
-              //     child: Container(
-              //       color: const Color(0xFF781f1e),
-              //       width: 40,
-              //       height: 40,
-              //       child: const Icon(
-              //         Icons.drive_file_rename_outline,
-              //         size: 40,
-              //         color: Color(0xFFf6faf8),
-              //       ),
-              //     ),
-              //   ),
-              // ),
-            ],
-          )
-        ],
-      ),
-    );
-  }
-
-//--------------------------------------------------------------
-//-------------------------- _takeSignature --------------------
-//--------------------------------------------------------------
-
-  void _takeSignature() async {
-    Response? response = await Navigator.push(
-      context,
-      MaterialPageRoute(
-        builder: (context) => const FirmaScreen(),
-      ),
-    );
-    if (response != null) {
-      setState(() {
-        _signatureChanged = true;
-        _signature = response.result;
-      });
-    }
   }
 
 //--------------------------------------------------------------
@@ -472,82 +402,71 @@ class _InstalacionNuevaScreenState extends State<InstalacionNuevaScreen> {
   }
 
 //--------------------------------------------------------------
-//-------------------------- _showSignName ---------------------
+//-------------------------- _showAddress ----------------------
 //--------------------------------------------------------------
 
-  Widget _showSignName() {
+  Widget _showAddress() {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
-      child: TextField(
-        controller: _signnameController,
-        decoration: InputDecoration(
-            fillColor: _signname == "" ? Colors.yellow[200] : Colors.white,
-            filled: true,
-            hintText: 'Ingrese Nombre y Apellido del Firmante...',
-            labelText: 'Nombre y Apellido del Firmante',
-            errorText: _signnameShowError ? _signnameError : null,
-            suffixIcon: const Icon(Icons.person),
-            border:
-                OutlineInputBorder(borderRadius: BorderRadius.circular(10))),
-        onChanged: (value) {
-          _signname = value;
-        },
+      child: Row(
+        children: [
+          Expanded(
+            child: TextField(
+              controller: _addressController,
+              keyboardType: TextInputType.number,
+              decoration: InputDecoration(
+                  fillColor: _address == "" ? Colors.yellow[200] : Colors.white,
+                  filled: true,
+                  enabled: true,
+                  hintText: 'Ingresa domicilio...',
+                  labelText: 'Domicilio',
+                  errorText: _addressShowError ? _addressError : null,
+                  suffixIcon: const Icon(Icons.home),
+                  border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(10))),
+              onChanged: (value) {
+                _address = value;
+              },
+            ),
+          ),
+          const SizedBox(width: 10),
+          ElevatedButton(
+              style: ElevatedButton.styleFrom(
+                backgroundColor: const Color(0xFF781f1e),
+                minimumSize: const Size(50, 40),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(5),
+                ),
+              ),
+              onPressed: () async {
+                await _getPosition();
+              },
+              child: const Icon(Icons.travel_explore)),
+        ],
       ),
     );
   }
 
 //--------------------------------------------------------------
-//-------------------------- _showPedido -----------------------
+//-------------------------- _showLatLong ----------------------
 //--------------------------------------------------------------
 
-  Widget _showPedido() {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
-      child: TextField(
-        controller: _pedidoController,
-        decoration: InputDecoration(
-            fillColor: _pedido == "" ? Colors.yellow[200] : Colors.white,
-            filled: true,
-            hintText: 'Ingrese pedido...',
-            labelText: 'Pedido',
-            errorText: _pedidoShowError ? _pedidoError : null,
-            suffixIcon: const Icon(Icons.grade),
-            border:
-                OutlineInputBorder(borderRadius: BorderRadius.circular(10))),
-        onChanged: (value) {
-          _pedido = value;
-        },
-      ),
+  Widget _showLatLong() {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 5),
+      child: _positionUser.latitude != 0
+          ? Align(
+              alignment: Alignment.centerLeft,
+              child: Text(
+                "Lat-Long: ${_positionUser.latitude} / ${_positionUser.longitude}",
+              ),
+            )
+          : Container(),
     );
   }
 
-//--------------------------------------------------------------
-//-------------------------- _showEntrecalles ------------------
-//--------------------------------------------------------------
-
-  Widget _showEntrecalles() {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
-      child: TextField(
-        controller: _entrecallesController,
-        decoration: InputDecoration(
-            fillColor: _entrecalles == "" ? Colors.yellow[200] : Colors.white,
-            filled: true,
-            hintText: 'Ingrese entre calles...',
-            labelText: 'Entre calles',
-            errorText: _entrecallesShowError ? _entrecallesError : null,
-            suffixIcon: const Icon(Icons.signpost),
-            border:
-                OutlineInputBorder(borderRadius: BorderRadius.circular(10))),
-        onChanged: (value) {
-          _entrecalles = value;
-        },
-      ),
-    );
-  }
-
-  //-----------------------------------------------------------------
-//--------------------- _showFechas -------------------------------
+//-----------------------------------------------------------------
+//--------------------- _showFechaInstalacion ---------------------
 //-----------------------------------------------------------------
 
   Widget _showFechaInstalacion() {
@@ -620,7 +539,7 @@ class _InstalacionNuevaScreenState extends State<InstalacionNuevaScreen> {
   }
 
 //-----------------------------------------------------------------
-//--------------------- _fechaInicio ------------------------------
+//--------------------- _fechaInstalacion -------------------------
 //-----------------------------------------------------------------
 
   _fechaInstalacion() async {
@@ -638,7 +557,185 @@ class _InstalacionNuevaScreenState extends State<InstalacionNuevaScreen> {
     }
   }
 
-  //-----------------------------------------------------------------
+//--------------------------------------------------------------
+//-------------------------- _showPedido -----------------------
+//--------------------------------------------------------------
+
+  Widget _showPedido() {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+      child: TextField(
+        controller: _pedidoController,
+        decoration: InputDecoration(
+            fillColor: _pedido == "" ? Colors.yellow[200] : Colors.white,
+            filled: true,
+            hintText: 'Ingrese pedido...',
+            labelText: 'Pedido',
+            errorText: _pedidoShowError ? _pedidoError : null,
+            suffixIcon: const Icon(Icons.grade),
+            border:
+                OutlineInputBorder(borderRadius: BorderRadius.circular(10))),
+        onChanged: (value) {
+          _pedido = value;
+        },
+      ),
+    );
+  }
+
+//--------------------------------------------------------------
+//-------------------------- _showEntrecalles ------------------
+//--------------------------------------------------------------
+
+  Widget _showEntrecalles() {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+      child: TextField(
+        controller: _entrecallesController,
+        decoration: InputDecoration(
+            fillColor: _entrecalles == "" ? Colors.yellow[200] : Colors.white,
+            filled: true,
+            hintText: 'Ingrese entre calles...',
+            labelText: 'Entre calles',
+            errorText: _entrecallesShowError ? _entrecallesError : null,
+            suffixIcon: const Icon(Icons.signpost),
+            border:
+                OutlineInputBorder(borderRadius: BorderRadius.circular(10))),
+        onChanged: (value) {
+          _entrecalles = value;
+        },
+      ),
+    );
+  }
+
+//-----------------------------------------------------------------
+//--------------------- _showAveria -------------------------------
+//-----------------------------------------------------------------
+
+  Widget _showAveria() {
+    return Padding(
+      padding: const EdgeInsets.only(left: 15.0, top: 10),
+      child: Row(
+        children: [
+          const Text("Es avería: ",
+              style: TextStyle(
+                fontSize: 15,
+                color: Colors.black,
+              )),
+          Checkbox(
+            value: _esAveria,
+            onChanged: (value) {
+              _esAveria = !_esAveria;
+              value = _esAveria;
+              setState(() {});
+            },
+            checkColor: Colors.white,
+            materialTapTargetSize: MaterialTapTargetSize.padded,
+            activeColor: const Color(0xFF781f1e),
+          ),
+        ],
+      ),
+    );
+  }
+
+//--------------------------------------------------------------
+//-------------------------- _showButtonsFirma -----------------
+//--------------------------------------------------------------
+
+  Widget _showButtonsFirma(ancho) {
+    double ancho = MediaQuery.of(context).size.width;
+    return Container(
+      margin: const EdgeInsets.only(left: 5, right: 5, top: 5),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: <Widget>[
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              InkWell(
+                onTap: () => _takeSignature(),
+                child: Container(
+                  child: !_signatureChanged
+                      ? Image(
+                          image: const AssetImage('assets/firma.png'),
+                          width: ancho * 0.7,
+                          fit: BoxFit.contain)
+                      : Image.memory(
+                          _signature!.buffer.asUint8List(),
+                          width: ancho * 0.7,
+                        ),
+                ),
+              ),
+              const SizedBox(
+                width: 10,
+              ),
+              // InkWell(
+              //   onTap: () => _takeSignature(),
+              //   child: ClipRRect(
+              //     borderRadius: BorderRadius.circular(30),
+              //     child: Container(
+              //       color: const Color(0xFF781f1e),
+              //       width: 40,
+              //       height: 40,
+              //       child: const Icon(
+              //         Icons.drive_file_rename_outline,
+              //         size: 40,
+              //         color: Color(0xFFf6faf8),
+              //       ),
+              //     ),
+              //   ),
+              // ),
+            ],
+          )
+        ],
+      ),
+    );
+  }
+
+//--------------------------------------------------------------
+//-------------------------- _takeSignature --------------------
+//--------------------------------------------------------------
+
+  void _takeSignature() async {
+    Response? response = await Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => const FirmaScreen(),
+      ),
+    );
+    if (response != null) {
+      setState(() {
+        _signatureChanged = true;
+        _signature = response.result;
+      });
+    }
+  }
+
+//--------------------------------------------------------------
+//-------------------------- _showSignName ---------------------
+//--------------------------------------------------------------
+
+  Widget _showSignName() {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+      child: TextField(
+        controller: _signnameController,
+        decoration: InputDecoration(
+            fillColor: _signname == "" ? Colors.yellow[200] : Colors.white,
+            filled: true,
+            hintText: 'Ingrese Nombre y Apellido del Firmante...',
+            labelText: 'Nombre y Apellido del Firmante',
+            errorText: _signnameShowError ? _signnameError : null,
+            suffixIcon: const Icon(Icons.person),
+            border:
+                OutlineInputBorder(borderRadius: BorderRadius.circular(10))),
+        onChanged: (value) {
+          _signname = value;
+        },
+      ),
+    );
+  }
+
+//-----------------------------------------------------------------
 //--------------------- _showButton -------------------------------
 //-----------------------------------------------------------------
 
@@ -675,7 +772,7 @@ class _InstalacionNuevaScreenState extends State<InstalacionNuevaScreen> {
     );
   }
 
-  //-----------------------------------------------------------------
+//-----------------------------------------------------------------
 //--------------------- _save -------------------------------------
 //-----------------------------------------------------------------
 
@@ -698,9 +795,6 @@ class _InstalacionNuevaScreenState extends State<InstalacionNuevaScreen> {
       isValid = false;
       _documentShowError = true;
       _documentError = 'Ingrese un Documento';
-
-      setState(() {});
-      return isValid;
     } else {
       _documentShowError = false;
     }
@@ -709,9 +803,6 @@ class _InstalacionNuevaScreenState extends State<InstalacionNuevaScreen> {
       isValid = false;
       _firstnameShowError = true;
       _firstnameError = 'Ingrese un Nombre';
-
-      setState(() {});
-      return isValid;
     } else {
       _firstnameShowError = false;
     }
@@ -720,9 +811,6 @@ class _InstalacionNuevaScreenState extends State<InstalacionNuevaScreen> {
       isValid = false;
       _lastnameShowError = true;
       _lastnameError = 'Ingrese un Apellido';
-
-      setState(() {});
-      return isValid;
     } else {
       _lastnameShowError = false;
     }
@@ -752,8 +840,22 @@ class _InstalacionNuevaScreenState extends State<InstalacionNuevaScreen> {
               ],
             );
           });
-      setState(() {});
-      return isValid;
+    }
+
+    if (_tipoinstalacion == 'Elija un tipo de instalación...') {
+      isValid = false;
+      _tipoinstalacionShowError = true;
+      _tipoinstalacionError = 'Debe elegir un tipo de instalación';
+    } else {
+      _tipoinstalacionShowError = false;
+    }
+
+    if (_pedido == "") {
+      isValid = false;
+      _pedidoShowError = true;
+      _pedidoError = 'Ingrese Pedido';
+    } else {
+      _pedidoShowError = false;
     }
 
     setState(() {});
@@ -769,6 +871,12 @@ class _InstalacionNuevaScreenState extends State<InstalacionNuevaScreen> {
     setState(() {
       _showLoader = true;
     });
+
+    String base64ImageFirmaCliente = '';
+    if (_signatureChanged) {
+      List<int> imageBytesFirmaCliente = _signature!.buffer.asUint8List();
+      base64ImageFirmaCliente = base64Encode(imageBytesFirmaCliente);
+    }
 
     var connectivityResult = await Connectivity().checkConnectivity();
 
@@ -790,15 +898,30 @@ class _InstalacionNuevaScreenState extends State<InstalacionNuevaScreen> {
 
     Map<String, dynamic> request = {
       //'nroregistro': _ticket.nroregistro,
-      'grupo': widget.user.codigogrupo,
-      'causante': widget.user.codigoCausante,
-      'fechacarga': ahora,
-      'fechaiinstalacion': fechaInstalacion.toString(),
-      'idusuario': widget.user.idUsuario,
+      'NroObra': 2,
+      'IdUsuario': widget.user.idUsuario,
+      'Imei': widget.imei,
+      'Fecha': DateTime.now().toString(),
+      'Latitud': _positionUser.latitude.toString(),
+      'Longitud': _positionUser.longitude.toString(),
+      'FechaInstalacion': fechaInstalacion.toString(),
+      'Grupo': widget.user.grupo,
+      'Causante': widget.user.codigoCausante,
+      'Pedido': _pedido,
+      'NombreCliente': _firstname,
+      'ApellidoCliente': _lastname,
+      'Documento': _document,
+      'DomicilioInstalacion': _address,
+      'EntreCalles': _entrecalles,
+      'ImageArrayFIRMACLIENTE': base64ImageFirmaCliente,
+      'NombreApellidoFirmante': _signname,
+      'TipoInstalacion': _tipoinstalacion,
+      'EsAveria': _esAveria ? 'SI' : 'NO',
+      'Auditado': 0,
     };
 
-    Response response =
-        await ApiHelper.postNoToken('/api/Controlador/Metodo', request);
+    Response response = await ApiHelper.postNoToken(
+        '/api/AppInstalacionesEquipo/PostAppInstalacionesEquipo', request);
 
     setState(() {
       _showLoader = false;
@@ -867,7 +990,7 @@ class _InstalacionNuevaScreenState extends State<InstalacionNuevaScreen> {
       TipoInstalacion(tipoinstalacion: 'IPTV'),
       TipoInstalacion(tipoinstalacion: 'Otro'),
     ];
-    await _getPosition();
+
     setState(() {});
   }
 
@@ -902,36 +1025,6 @@ class _InstalacionNuevaScreenState extends State<InstalacionNuevaScreen> {
   }
 
 //-----------------------------------------------------------------
-//--------------------- _showAveria -------------------------------
-//-----------------------------------------------------------------
-
-  Widget _showAveria() {
-    return Padding(
-      padding: const EdgeInsets.only(left: 15.0, top: 10),
-      child: Row(
-        children: [
-          const Text("Es avería: ",
-              style: TextStyle(
-                fontSize: 15,
-                color: Colors.black,
-              )),
-          Checkbox(
-            value: _esAveria,
-            onChanged: (value) {
-              _esAveria = !_esAveria;
-              value = _esAveria;
-              setState(() {});
-            },
-            checkColor: Colors.white,
-            materialTapTargetSize: MaterialTapTargetSize.padded,
-            activeColor: const Color(0xFF781f1e),
-          ),
-        ],
-      ),
-    );
-  }
-
-  //-----------------------------------------------------------------
 //--------------------- _getPosition ------------------------------
 //-----------------------------------------------------------------
 
@@ -1004,8 +1097,10 @@ class _InstalacionNuevaScreenState extends State<InstalacionNuevaScreen> {
 
       List<Placemark> placemarks = await placemarkFromCoordinates(
           _positionUser.latitude, _positionUser.longitude);
-      direccion =
-          "${placemarks[0].street} - ${placemarks[0].locality} - ${placemarks[0].country}";
+      _address = "${placemarks[0].street} - ${placemarks[0].locality}";
+
+      _addressController.text = _address;
     }
+    setState(() {});
   }
 }
