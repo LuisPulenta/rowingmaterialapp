@@ -72,7 +72,7 @@ class _HomeScreenState extends State<HomeScreen> {
               width: 500,
             ),
             const Text(
-              'MATERIALES',
+              'LOGISTICA',
               style: TextStyle(
                   fontSize: 32,
                   fontWeight: FontWeight.bold,

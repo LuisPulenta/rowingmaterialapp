@@ -24,11 +24,11 @@ class _LoginScreenState extends State<LoginScreen> {
 //----------------------- Variables -----------------------------
 //---------------------------------------------------------------
 
-  //String _email = '';
-  //String _password = '';
+  String _email = '';
+  String _password = '';
 
-  String _email = '102131';
-  String _password = '32766601';
+  // String _email = '102131';
+  // String _password = '32766601';
 
   String _emailError = '';
   bool _emailShowError = false;
@@ -92,7 +92,7 @@ class _LoginScreenState extends State<LoginScreen> {
                     width: 500,
                   ),
                   const Text(
-                    'MATERIALES',
+                    'LOGISTICA',
                     style: TextStyle(
                         fontSize: 32,
                         fontWeight: FontWeight.bold,
