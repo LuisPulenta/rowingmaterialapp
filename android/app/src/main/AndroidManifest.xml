@@ -1,5 +1,5 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.example.rowingmaterialapp">
+    package="com.keypress.rowingmaterialapp">
    <application
         android:label="Rowing Logística App"
         android:name="${applicationName}"
