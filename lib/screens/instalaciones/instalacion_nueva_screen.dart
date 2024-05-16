@@ -76,6 +76,8 @@ class _InstalacionNuevaScreenState extends State<InstalacionNuevaScreen> {
 
   List<TipoInstalacion> _tiposinstalacion = [];
 
+  List<String> _series = [];
+
   String _pedido = '';
   String _pedidoError = '';
   bool _pedidoShowError = false;
@@ -88,7 +90,12 @@ class _InstalacionNuevaScreenState extends State<InstalacionNuevaScreen> {
 
   bool _esAveria = false;
 
-  Position _positionUser = Position(
+  String _serie = '';
+  String _serieError = '';
+  bool _serieShowError = false;
+  TextEditingController _serieController = TextEditingController();
+
+  Position _positionUser = const Position(
       longitude: 0,
       latitude: 0,
       timestamp: null,
@@ -130,51 +137,6 @@ class _InstalacionNuevaScreenState extends State<InstalacionNuevaScreen> {
         physics: const BouncingScrollPhysics(),
         child: Column(
           children: <Widget>[
-            // Padding(
-            //   padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 5),
-            //   child: Align(
-            //     alignment: Alignment.centerLeft,
-            //     child: Text(
-            //       "IDUsuario: ${widget.user.idUsuario}",
-            //     ),
-            //   ),
-            // ),
-            // Padding(
-            //   padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 5),
-            //   child: Align(
-            //     alignment: Alignment.centerLeft,
-            //     child: Text(
-            //       "Imei: ${widget.imei}",
-            //     ),
-            //   ),
-            // ),
-            // Padding(
-            //   padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 5),
-            //   child: Align(
-            //     alignment: Alignment.centerLeft,
-            //     child: Text(
-            //       "Fecha y Hora de carga: ${DateTime.now().toString()}",
-            //     ),
-            //   ),
-            // ),
-            // Padding(
-            //   padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 5),
-            //   child: Align(
-            //     alignment: Alignment.centerLeft,
-            //     child: Text(
-            //       "Grupo: ${widget.user.grupo}",
-            //     ),
-            //   ),
-            // ),
-            // Padding(
-            //   padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 5),
-            //   child: Align(
-            //     alignment: Alignment.centerLeft,
-            //     child: Text(
-            //       "Causante: ${widget.user.codigoCausante}",
-            //     ),
-            //   ),
-            // ),
             const SizedBox(
               height: 15,
             ),
@@ -219,6 +181,40 @@ class _InstalacionNuevaScreenState extends State<InstalacionNuevaScreen> {
               mainAxisAlignment: MainAxisAlignment.spaceAround,
               children: const [
                 Titulo(
+                  texto: "EQUIPOS INSTALADOS",
+                  color: Color.fromARGB(255, 10, 226, 250),
+                ),
+              ],
+            ),
+            _series.isNotEmpty
+                ? Padding(
+                    padding: const EdgeInsets.symmetric(vertical: 5.0),
+                    child: Text(
+                        "Cant. de Equipos instalados: ${_series.length}",
+                        style: const TextStyle(
+                            fontSize: 16, fontWeight: FontWeight.bold)),
+                  )
+                : Container(),
+            _series.isEmpty
+                ? const Padding(
+                    padding: EdgeInsets.symmetric(vertical: 5),
+                    child: Text(
+                      'No hay Equipos registrados',
+                      style: TextStyle(
+                          color: Colors.red,
+                          fontSize: 16,
+                          fontWeight: FontWeight.bold),
+                    ),
+                  )
+                : SizedBox(height: _series.length * 54, child: _showSeries()),
+            _showSerie(),
+            const Divider(
+              color: Colors.black,
+            ),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceAround,
+              children: const [
+                Titulo(
                   texto: "CONFORMIDAD CLIENTE",
                   color: Color.fromARGB(255, 10, 226, 250),
                 ),
@@ -251,6 +247,44 @@ class _InstalacionNuevaScreenState extends State<InstalacionNuevaScreen> {
           ],
         ),
       ),
+    );
+  }
+
+//--------------------------------------------------------------
+//-------------------------- _showSeries ---------------------
+//--------------------------------------------------------------
+
+  Widget _showSeries() {
+    return ListView(
+      children: _series.map((e) {
+        return Card(
+          color: const Color.fromARGB(255, 142, 210, 237),
+          shadowColor: Colors.white,
+          elevation: 10,
+          margin: const EdgeInsets.fromLTRB(10, 2, 10, 2),
+          child: Container(
+            height: 50,
+            margin: const EdgeInsets.all(0),
+            padding: const EdgeInsets.all(5),
+            child: Row(
+              children: [
+                Text(e),
+                const Spacer(),
+                IconButton(
+                  onPressed: () {
+                    _series.remove(e);
+                    setState(() {});
+                  },
+                  icon: const Icon(
+                    Icons.delete,
+                    color: Colors.red,
+                  ),
+                )
+              ],
+            ),
+          ),
+        );
+      }).toList(),
     );
   }
 
@@ -652,6 +686,311 @@ class _InstalacionNuevaScreenState extends State<InstalacionNuevaScreen> {
   }
 
 //--------------------------------------------------------------
+//-------------------------- _showSerie ------------------------
+//--------------------------------------------------------------
+
+  Widget _showSerie() {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+      child: Row(
+        children: [
+          const Text("N° Serie: ",
+              style: TextStyle(
+                fontSize: 16,
+                color: Colors.black,
+                fontWeight: FontWeight.bold,
+              )),
+          Expanded(
+            flex: 7,
+            child: Text(_serie,
+                style: const TextStyle(
+                  fontSize: 16,
+                  color: Color.fromARGB(255, 33, 37, 243),
+                  fontWeight: FontWeight.bold,
+                )),
+          ),
+          const SizedBox(width: 10),
+          ElevatedButton(
+              style: ElevatedButton.styleFrom(
+                backgroundColor: const Color(0xFF781f1e),
+                minimumSize: const Size(40, 40),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(5),
+                ),
+              ),
+              onPressed: () async {
+                // VALIDAR QUE EL NUMERO DE SERIE ESTE DISPONIBLE
+
+                if (_series.contains(_serie)) {
+                  showDialog(
+                      context: context,
+                      builder: (context) {
+                        return AlertDialog(
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(10),
+                          ),
+                          title: const Text('Aviso'),
+                          content: Column(
+                              mainAxisSize: MainAxisSize.min,
+                              children: const <Widget>[
+                                Text('Este N° de Serie ya fue agregado.'),
+                                SizedBox(
+                                  height: 10,
+                                ),
+                              ]),
+                          actions: <Widget>[
+                            TextButton(
+                                onPressed: () => Navigator.of(context).pop(),
+                                child: const Text('Ok')),
+                          ],
+                        );
+                      });
+                  return;
+                }
+
+                if (_serie.isNotEmpty) {
+                  _series.add(_serie);
+                  _serie = '';
+                  setState(() {});
+                }
+              },
+              child: const Icon(Icons.check)),
+          const SizedBox(width: 10),
+          ElevatedButton(
+              style: ElevatedButton.styleFrom(
+                backgroundColor: const Color(0xFF781f1e),
+                minimumSize: const Size(40, 40),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(5),
+                ),
+              ),
+              onPressed: () {
+                showDialog(
+                    context: context,
+                    builder: (BuildContext context) {
+                      _serieController.text = '';
+                      return Center(
+                        child: Column(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            AlertDialog(
+                              backgroundColor: Colors.grey[300],
+                              title: const Text("Ingrese o escanee el código"),
+                              content: Column(
+                                children: [
+                                  TextField(
+                                    autofocus: true,
+                                    controller: _serieController,
+                                    decoration: InputDecoration(
+                                        fillColor: Colors.white,
+                                        filled: true,
+                                        hintText: '',
+                                        labelText: '',
+                                        errorText: _serieShowError
+                                            ? _serieError
+                                            : null,
+                                        prefixIcon: const Icon(Icons.tag),
+                                        border: OutlineInputBorder(
+                                            borderRadius:
+                                                BorderRadius.circular(10))),
+                                    onChanged: (value) {
+                                      _serie = value;
+                                    },
+                                  ),
+                                  const SizedBox(height: 10),
+                                  ElevatedButton(
+                                      style: ElevatedButton.styleFrom(
+                                        backgroundColor:
+                                            const Color(0xFF282886),
+                                        minimumSize: const Size(50, 50),
+                                        shape: RoundedRectangleBorder(
+                                          borderRadius:
+                                              BorderRadius.circular(5),
+                                        ),
+                                      ),
+                                      onPressed: () async {
+                                        String barcodeScanRes;
+                                        try {
+                                          barcodeScanRes =
+                                              await FlutterBarcodeScanner
+                                                  .scanBarcode(
+                                                      '#3D8BEF',
+                                                      'Cancelar',
+                                                      false,
+                                                      ScanMode.DEFAULT);
+                                          //print(barcodeScanRes);
+                                        } on PlatformException {
+                                          barcodeScanRes = 'Error';
+                                        }
+                                        // if (!mounted) return;
+                                        if (barcodeScanRes == '-1') {
+                                          return;
+                                        }
+                                        _serieController.text = barcodeScanRes;
+                                      },
+                                      child: const Icon(Icons.qr_code_2)),
+                                ],
+                              ),
+                              actions: [
+                                Row(
+                                  children: [
+                                    Expanded(
+                                      child: ElevatedButton(
+                                          style: ElevatedButton.styleFrom(
+                                            backgroundColor:
+                                                const Color(0xFF120E43),
+                                            minimumSize:
+                                                const Size(double.infinity, 50),
+                                            shape: RoundedRectangleBorder(
+                                              borderRadius:
+                                                  BorderRadius.circular(5),
+                                            ),
+                                          ),
+                                          onPressed: () {
+                                            if (_serieController.text.length <
+                                                6) {
+                                              showDialog(
+                                                  context: context,
+                                                  builder: (context) {
+                                                    return AlertDialog(
+                                                      shape:
+                                                          RoundedRectangleBorder(
+                                                        borderRadius:
+                                                            BorderRadius
+                                                                .circular(10),
+                                                      ),
+                                                      title:
+                                                          const Text('Aviso'),
+                                                      content: Column(
+                                                          mainAxisSize:
+                                                              MainAxisSize.min,
+                                                          children: const <
+                                                              Widget>[
+                                                            Text(
+                                                                'El código debe tener al menos 6 caracteres.'),
+                                                            SizedBox(
+                                                              height: 10,
+                                                            ),
+                                                          ]),
+                                                      actions: <Widget>[
+                                                        TextButton(
+                                                            onPressed: () =>
+                                                                Navigator.of(
+                                                                        context)
+                                                                    .pop(),
+                                                            child: const Text(
+                                                                'Ok')),
+                                                      ],
+                                                    );
+                                                  });
+                                              FocusScope.of(context)
+                                                  .unfocus(); //Oculta el teclado
+                                              return;
+                                            }
+
+                                            if (_serieController.text
+                                                .contains("http")) {
+                                              showDialog(
+                                                  context: context,
+                                                  builder: (context) {
+                                                    return AlertDialog(
+                                                      shape:
+                                                          RoundedRectangleBorder(
+                                                        borderRadius:
+                                                            BorderRadius
+                                                                .circular(10),
+                                                      ),
+                                                      title:
+                                                          const Text('Aviso'),
+                                                      content: Column(
+                                                          mainAxisSize:
+                                                              MainAxisSize.min,
+                                                          children: const <
+                                                              Widget>[
+                                                            Text(
+                                                                'No puede regitrar direcciones Web.'),
+                                                            SizedBox(
+                                                              height: 10,
+                                                            ),
+                                                          ]),
+                                                      actions: <Widget>[
+                                                        TextButton(
+                                                            onPressed: () =>
+                                                                Navigator.of(
+                                                                        context)
+                                                                    .pop(),
+                                                            child: const Text(
+                                                                'Ok')),
+                                                      ],
+                                                    );
+                                                  });
+                                              FocusScope.of(context)
+                                                  .unfocus(); //Oculta el teclado
+                                              return;
+                                            }
+
+                                            _serie = _serieController.text
+                                                .toUpperCase();
+
+                                            FocusScope.of(context)
+                                                .unfocus(); //Oculta el teclado
+                                            Navigator.pop(context);
+                                            setState(() {});
+                                          },
+                                          child: Row(
+                                            mainAxisAlignment:
+                                                MainAxisAlignment.spaceAround,
+                                            children: const [
+                                              Icon(Icons.save),
+                                              Text('Aceptar'),
+                                            ],
+                                          )),
+                                    ),
+                                    const SizedBox(
+                                      width: 10,
+                                    ),
+                                    Expanded(
+                                      child: ElevatedButton(
+                                        style: ElevatedButton.styleFrom(
+                                          backgroundColor:
+                                              const Color(0xFFB4161B),
+                                          minimumSize:
+                                              const Size(double.infinity, 50),
+                                          shape: RoundedRectangleBorder(
+                                            borderRadius:
+                                                BorderRadius.circular(5),
+                                          ),
+                                        ),
+                                        onPressed: () {
+                                          Navigator.pop(context);
+                                        },
+                                        child: Row(
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.spaceAround,
+                                          children: const [
+                                            Icon(Icons.cancel),
+                                            Text('Cancelar'),
+                                          ],
+                                        ),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ],
+                            ),
+                          ],
+                        ),
+                      );
+                    },
+                    barrierDismissible: false);
+              },
+              child: const Icon(Icons.qr_code_2)),
+        ],
+      ),
+    );
+  }
+
+//--------------------------------------------------------------
 //-------------------------- _showButtonsFirma -----------------
 //--------------------------------------------------------------
 
@@ -910,6 +1249,33 @@ class _InstalacionNuevaScreenState extends State<InstalacionNuevaScreen> {
       _pedidoError = 'Pedido no puede contener más de 11 caracteres';
     } else {
       _pedidoShowError = false;
+    }
+
+    if (_series.isEmpty) {
+      isValid = false;
+      showDialog(
+          context: context,
+          builder: (context) {
+            return AlertDialog(
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(10),
+              ),
+              title: const Text('Aviso!'),
+              content: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: const <Widget>[
+                    Text('No hay Equipos Registrados.'),
+                    SizedBox(
+                      height: 10,
+                    ),
+                  ]),
+              actions: <Widget>[
+                TextButton(
+                    onPressed: () => Navigator.of(context).pop(),
+                    child: const Text('Ok')),
+              ],
+            );
+          });
     }
 
     if (_signature == null && !widget.editMode) {
