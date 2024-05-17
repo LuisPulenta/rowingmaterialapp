@@ -27,8 +27,11 @@ class _LoginScreenState extends State<LoginScreen> {
   //String _email = '';
   //String _password = '';
 
-  String _email = '102131';
-  String _password = '32766601';
+  // String _email = '102131';
+  // String _password = '32766601';
+
+  String _email = '520817';
+  String _password = '31790890';
 
   String _emailError = '';
   bool _emailShowError = false;
@@ -313,7 +316,7 @@ class _LoginScreenState extends State<LoginScreen> {
       'password': _password,
     };
 
-    var url = Uri.parse('${Constants.apiUrl}/Api/Account/GetUserByEmail');
+    var url = Uri.parse('${Constants.apiUrl}/Api/Account/GetUserByEmail2');
     var response = await http.post(
       url,
       headers: {

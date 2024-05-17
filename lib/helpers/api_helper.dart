@@ -107,4 +107,32 @@ class ApiHelper {
     }
     return Response(isSuccess: true, result: list);
   }
+
+//---------------------------------------------------------------------------
+  static Future<Response> getEquipo(
+      String grupo, String causante, String serie) async {
+    var url = Uri.parse(
+        '${Constants.apiUrl}/api/VistaSeriesSinUsarLotesDetalles/GetEquipo/$grupo/$causante/$serie');
+    var response = await http.post(
+      url,
+      headers: {
+        'content-type': 'application/json',
+        'accept': 'application/json',
+      },
+    );
+    var body = response.body;
+
+    if (response.statusCode >= 400) {
+      return Response(isSuccess: false, message: body);
+    }
+
+    List<SerieSinUsar> list = [];
+    var decodedJson = jsonDecode(body);
+    if (decodedJson != null) {
+      for (var item in decodedJson) {
+        list.add(SerieSinUsar.fromJson(item));
+      }
+    }
+    return Response(isSuccess: true, result: list);
+  }
 }

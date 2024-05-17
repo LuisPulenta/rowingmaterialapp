@@ -40,6 +40,9 @@ class _InstalacionNuevaScreenState extends State<InstalacionNuevaScreen> {
   bool _signatureChanged = false;
   late ByteData? _signature;
 
+  bool isValidSerie = false;
+  List<SerieSinUsar> _serieSinUsar = [];
+
   String _latitud = '';
   String _longitud = '';
 
@@ -785,7 +788,7 @@ class _InstalacionNuevaScreenState extends State<InstalacionNuevaScreen> {
                                                   BorderRadius.circular(5),
                                             ),
                                           ),
-                                          onPressed: () {
+                                          onPressed: () async {
                                             if (_serieController.text.length <
                                                 6) {
                                               showDialog(
@@ -872,6 +875,47 @@ class _InstalacionNuevaScreenState extends State<InstalacionNuevaScreen> {
                                                 .toUpperCase();
 
                                             // VALIDAR QUE EL NUMERO DE SERIE ESTE DISPONIBLE
+
+                                            isValidSerie =
+                                                await _validarSerie(_serie);
+
+                                            if (!isValidSerie) {
+                                              showDialog(
+                                                  context: context,
+                                                  builder: (context) {
+                                                    return AlertDialog(
+                                                      shape:
+                                                          RoundedRectangleBorder(
+                                                        borderRadius:
+                                                            BorderRadius
+                                                                .circular(10),
+                                                      ),
+                                                      title:
+                                                          const Text('Aviso'),
+                                                      content: Column(
+                                                          mainAxisSize:
+                                                              MainAxisSize.min,
+                                                          children: const <
+                                                              Widget>[
+                                                            Text(
+                                                                'N° de Serie no registrado para su Usuario.'),
+                                                            SizedBox(
+                                                              height: 10,
+                                                            ),
+                                                          ]),
+                                                      actions: <Widget>[
+                                                        TextButton(
+                                                            onPressed: () =>
+                                                                Navigator.of(
+                                                                        context)
+                                                                    .pop(),
+                                                            child: const Text(
+                                                                'Ok')),
+                                                      ],
+                                                    );
+                                                  });
+                                              return;
+                                            }
 
                                             if (_series.contains(_serie)) {
                                               showDialog(
@@ -1590,5 +1634,58 @@ class _InstalacionNuevaScreenState extends State<InstalacionNuevaScreen> {
     _signnameController.text = widget.instalacion.nombreApellidoFirmante;
 
     setState(() {});
+  }
+
+//---------------------------------------------------------------------------
+//-------------------------- _validarSerie ----------------------------------
+//---------------------------------------------------------------------------
+
+  Future<bool> _validarSerie(String serie) async {
+    setState(() {
+      _showLoader = true;
+    });
+
+    var connectivityResult = await Connectivity().checkConnectivity();
+
+    if (connectivityResult == ConnectivityResult.none) {
+      setState(() {
+        _showLoader = false;
+      });
+      await showAlertDialog(
+          context: context,
+          title: 'Error',
+          message: 'Verifica que estés conectado a Internet',
+          actions: <AlertDialogAction>[
+            const AlertDialogAction(key: null, label: 'Aceptar'),
+          ]);
+      return false;
+    }
+
+    Response response = Response(isSuccess: false);
+
+    response = await ApiHelper.getEquipo(
+        widget.user.grupo!, widget.user.codigoCausante, serie);
+
+    if (!response.isSuccess) {
+      await showAlertDialog(
+          context: context,
+          title: 'Error',
+          message: response.message,
+          actions: <AlertDialogAction>[
+            const AlertDialogAction(key: null, label: 'Aceptar'),
+          ]);
+      return false;
+    }
+
+    _serieSinUsar = response.result;
+    if (_serieSinUsar.length == 0) {
+      return false;
+    }
+
+    setState(() {
+      _showLoader = false;
+    });
+
+    return true;
   }
 }
