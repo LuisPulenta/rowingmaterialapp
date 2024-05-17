@@ -693,73 +693,12 @@ class _InstalacionNuevaScreenState extends State<InstalacionNuevaScreen> {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
       child: Row(
+        mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          const Text("N° Serie: ",
-              style: TextStyle(
-                fontSize: 16,
-                color: Colors.black,
-                fontWeight: FontWeight.bold,
-              )),
-          Expanded(
-            flex: 7,
-            child: Text(_serie,
-                style: const TextStyle(
-                  fontSize: 16,
-                  color: Color.fromARGB(255, 33, 37, 243),
-                  fontWeight: FontWeight.bold,
-                )),
-          ),
-          const SizedBox(width: 10),
           ElevatedButton(
               style: ElevatedButton.styleFrom(
                 backgroundColor: const Color(0xFF781f1e),
-                minimumSize: const Size(40, 40),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(5),
-                ),
-              ),
-              onPressed: () async {
-                // VALIDAR QUE EL NUMERO DE SERIE ESTE DISPONIBLE
-
-                if (_series.contains(_serie)) {
-                  showDialog(
-                      context: context,
-                      builder: (context) {
-                        return AlertDialog(
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(10),
-                          ),
-                          title: const Text('Aviso'),
-                          content: Column(
-                              mainAxisSize: MainAxisSize.min,
-                              children: const <Widget>[
-                                Text('Este N° de Serie ya fue agregado.'),
-                                SizedBox(
-                                  height: 10,
-                                ),
-                              ]),
-                          actions: <Widget>[
-                            TextButton(
-                                onPressed: () => Navigator.of(context).pop(),
-                                child: const Text('Ok')),
-                          ],
-                        );
-                      });
-                  return;
-                }
-
-                if (_serie.isNotEmpty) {
-                  _series.add(_serie);
-                  _serie = '';
-                  setState(() {});
-                }
-              },
-              child: const Icon(Icons.check)),
-          const SizedBox(width: 10),
-          ElevatedButton(
-              style: ElevatedButton.styleFrom(
-                backgroundColor: const Color(0xFF781f1e),
-                minimumSize: const Size(40, 40),
+                minimumSize: const Size(40, 50),
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(5),
                 ),
@@ -931,6 +870,52 @@ class _InstalacionNuevaScreenState extends State<InstalacionNuevaScreen> {
 
                                             _serie = _serieController.text
                                                 .toUpperCase();
+
+                                            // VALIDAR QUE EL NUMERO DE SERIE ESTE DISPONIBLE
+
+                                            if (_series.contains(_serie)) {
+                                              showDialog(
+                                                  context: context,
+                                                  builder: (context) {
+                                                    return AlertDialog(
+                                                      shape:
+                                                          RoundedRectangleBorder(
+                                                        borderRadius:
+                                                            BorderRadius
+                                                                .circular(10),
+                                                      ),
+                                                      title:
+                                                          const Text('Aviso'),
+                                                      content: Column(
+                                                          mainAxisSize:
+                                                              MainAxisSize.min,
+                                                          children: const <
+                                                              Widget>[
+                                                            Text(
+                                                                'Este N° de Serie ya fue agregado.'),
+                                                            SizedBox(
+                                                              height: 10,
+                                                            ),
+                                                          ]),
+                                                      actions: <Widget>[
+                                                        TextButton(
+                                                            onPressed: () =>
+                                                                Navigator.of(
+                                                                        context)
+                                                                    .pop(),
+                                                            child: const Text(
+                                                                'Ok')),
+                                                      ],
+                                                    );
+                                                  });
+                                              return;
+                                            }
+
+                                            if (_serie.isNotEmpty) {
+                                              _series.add(_serie);
+                                              _serie = '';
+                                              setState(() {});
+                                            }
 
                                             FocusScope.of(context)
                                                 .unfocus(); //Oculta el teclado
