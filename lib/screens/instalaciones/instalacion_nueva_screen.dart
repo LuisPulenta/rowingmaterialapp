@@ -41,7 +41,54 @@ class _InstalacionNuevaScreenState extends State<InstalacionNuevaScreen> {
   late ByteData? _signature;
 
   bool isValidSerie = false;
+  bool existeSerie = false;
   List<SerieSinUsar> _serieSinUsar = [];
+  List<SerieSinUsar> _series = [];
+  SerieSinUsar _serieConDatos = SerieSinUsar(
+      nroregistro: 0,
+      nrolotecab: 0,
+      grupoh: '',
+      causanteh: '',
+      nroseriesalida: '',
+      codigosiag: '',
+      codigosap: '',
+      denominacion: '');
+
+  AppInstalacionesEquipo appInstalacionesEquipo = AppInstalacionesEquipo(
+      idRegistro: 0,
+      nroObra: 0,
+      idUsuario: 0,
+      imei: '',
+      fecha: '',
+      latitud: '',
+      longitud: '',
+      fechaInstalacion: '',
+      grupo: '',
+      causante: '',
+      pedido: '',
+      nombreCliente: '',
+      apellidoCliente: '',
+      documento: '',
+      domicilioInstalacion: '',
+      entreCalles: '',
+      firmacliente: '',
+      nombreApellidoFirmante: '',
+      tipoInstalacion: '',
+      esAveria: '',
+      auditado: 0,
+      firmaclienteImageFullPath: '');
+
+  final SerieSinUsar _serieConDatosVacia = SerieSinUsar(
+      nroregistro: 0,
+      nrolotecab: 0,
+      grupoh: '',
+      causanteh: '',
+      nroseriesalida: '',
+      codigosiag: '',
+      codigosap: '',
+      denominacion: '');
+
+  String _serie = '';
 
   String _latitud = '';
   String _longitud = '';
@@ -79,8 +126,6 @@ class _InstalacionNuevaScreenState extends State<InstalacionNuevaScreen> {
 
   List<TipoInstalacion> _tiposinstalacion = [];
 
-  List<String> _series = [];
-
   String _pedido = '';
   String _pedidoError = '';
   bool _pedidoShowError = false;
@@ -93,7 +138,6 @@ class _InstalacionNuevaScreenState extends State<InstalacionNuevaScreen> {
 
   bool _esAveria = false;
 
-  String _serie = '';
   String _serieError = '';
   bool _serieShowError = false;
   TextEditingController _serieController = TextEditingController();
@@ -271,7 +315,20 @@ class _InstalacionNuevaScreenState extends State<InstalacionNuevaScreen> {
             padding: const EdgeInsets.all(5),
             child: Row(
               children: [
-                Text(e),
+                Text(
+                  e.nroseriesalida,
+                  style: const TextStyle(fontWeight: FontWeight.bold),
+                ),
+                const SizedBox(
+                  width: 5,
+                ),
+                e.denominacion!.length > 25
+                    ? Text(
+                        e.denominacion!.substring(0, 25),
+                      )
+                    : Text(
+                        e.denominacion!,
+                      ),
                 const Spacer(),
                 IconButton(
                   onPressed: () {
@@ -832,40 +889,9 @@ class _InstalacionNuevaScreenState extends State<InstalacionNuevaScreen> {
 
                                             if (_serieController.text
                                                 .contains("http")) {
-                                              showDialog(
-                                                  context: context,
-                                                  builder: (context) {
-                                                    return AlertDialog(
-                                                      shape:
-                                                          RoundedRectangleBorder(
-                                                        borderRadius:
-                                                            BorderRadius
-                                                                .circular(10),
-                                                      ),
-                                                      title:
-                                                          const Text('Aviso'),
-                                                      content: Column(
-                                                          mainAxisSize:
-                                                              MainAxisSize.min,
-                                                          children: const <
-                                                              Widget>[
-                                                            Text(
-                                                                'No puede regitrar direcciones Web.'),
-                                                            SizedBox(
-                                                              height: 10,
-                                                            ),
-                                                          ]),
-                                                      actions: <Widget>[
-                                                        TextButton(
-                                                            onPressed: () =>
-                                                                Navigator.of(
-                                                                        context)
-                                                                    .pop(),
-                                                            child: const Text(
-                                                                'Ok')),
-                                                      ],
-                                                    );
-                                                  });
+                                              displayAlerta(context, "Aviso",
+                                                  "No puede registrar direcciones Web.");
+
                                               FocusScope.of(context)
                                                   .unfocus(); //Oculta el teclado
                                               return;
@@ -880,83 +906,30 @@ class _InstalacionNuevaScreenState extends State<InstalacionNuevaScreen> {
                                                 await _validarSerie(_serie);
 
                                             if (!isValidSerie) {
-                                              showDialog(
-                                                  context: context,
-                                                  builder: (context) {
-                                                    return AlertDialog(
-                                                      shape:
-                                                          RoundedRectangleBorder(
-                                                        borderRadius:
-                                                            BorderRadius
-                                                                .circular(10),
-                                                      ),
-                                                      title:
-                                                          const Text('Aviso'),
-                                                      content: Column(
-                                                          mainAxisSize:
-                                                              MainAxisSize.min,
-                                                          children: const <
-                                                              Widget>[
-                                                            Text(
-                                                                'N° de Serie no registrado para su Usuario.'),
-                                                            SizedBox(
-                                                              height: 10,
-                                                            ),
-                                                          ]),
-                                                      actions: <Widget>[
-                                                        TextButton(
-                                                            onPressed: () =>
-                                                                Navigator.of(
-                                                                        context)
-                                                                    .pop(),
-                                                            child: const Text(
-                                                                'Ok')),
-                                                      ],
-                                                    );
-                                                  });
+                                              displayAlerta(context, "Aviso",
+                                                  "N° de Serie no registrado para su Usuario.");
+
                                               return;
                                             }
 
-                                            if (_series.contains(_serie)) {
-                                              showDialog(
-                                                  context: context,
-                                                  builder: (context) {
-                                                    return AlertDialog(
-                                                      shape:
-                                                          RoundedRectangleBorder(
-                                                        borderRadius:
-                                                            BorderRadius
-                                                                .circular(10),
-                                                      ),
-                                                      title:
-                                                          const Text('Aviso'),
-                                                      content: Column(
-                                                          mainAxisSize:
-                                                              MainAxisSize.min,
-                                                          children: const <
-                                                              Widget>[
-                                                            Text(
-                                                                'Este N° de Serie ya fue agregado.'),
-                                                            SizedBox(
-                                                              height: 10,
-                                                            ),
-                                                          ]),
-                                                      actions: <Widget>[
-                                                        TextButton(
-                                                            onPressed: () =>
-                                                                Navigator.of(
-                                                                        context)
-                                                                    .pop(),
-                                                            child: const Text(
-                                                                'Ok')),
-                                                      ],
-                                                    );
-                                                  });
+                                            _series.forEach((serie) async {
+                                              if (serie.nroseriesalida
+                                                      .toLowerCase() ==
+                                                  _serie.toLowerCase()) {
+                                                existeSerie = true;
+                                              }
+                                            });
+
+                                            if (existeSerie) {
+                                              displayAlerta(context, "Aviso",
+                                                  "Este N° de Serie ya fue agregado.");
+
+                                              existeSerie = false;
                                               return;
                                             }
 
                                             if (_serie.isNotEmpty) {
-                                              _series.add(_serie);
+                                              _series.add(_serieConDatos);
                                               _serie = '';
                                               setState(() {});
                                             }
@@ -1231,29 +1204,8 @@ class _InstalacionNuevaScreenState extends State<InstalacionNuevaScreen> {
 
     if (fechaInstalacion == null) {
       isValid = false;
-      showDialog(
-          context: context,
-          builder: (context) {
-            return AlertDialog(
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(10),
-              ),
-              title: const Text('Aviso!'),
-              content: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: const <Widget>[
-                    Text('Debe ingresar una Fecha de Instalación.'),
-                    SizedBox(
-                      height: 10,
-                    ),
-                  ]),
-              actions: <Widget>[
-                TextButton(
-                    onPressed: () => Navigator.of(context).pop(),
-                    child: const Text('Ok')),
-              ],
-            );
-          });
+      displayAlerta(
+          context, "Aviso", "Debe ingresar una Fecha de Instalación.");
     }
 
     if (_tipoinstalacion == 'Elija un tipo de instalación...') {
@@ -1282,56 +1234,12 @@ class _InstalacionNuevaScreenState extends State<InstalacionNuevaScreen> {
 
     if (_series.isEmpty) {
       isValid = false;
-      showDialog(
-          context: context,
-          builder: (context) {
-            return AlertDialog(
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(10),
-              ),
-              title: const Text('Aviso!'),
-              content: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: const <Widget>[
-                    Text('No hay Equipos Registrados.'),
-                    SizedBox(
-                      height: 10,
-                    ),
-                  ]),
-              actions: <Widget>[
-                TextButton(
-                    onPressed: () => Navigator.of(context).pop(),
-                    child: const Text('Ok')),
-              ],
-            );
-          });
+      displayAlerta(context, "Aviso", "No hay Equipos Registrados.");
     }
 
     if (_signature == null && !widget.editMode) {
       isValid = false;
-      showDialog(
-          context: context,
-          builder: (context) {
-            return AlertDialog(
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(10),
-              ),
-              title: const Text('Aviso!'),
-              content: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: const <Widget>[
-                    Text('Debe haber firma del cliente.'),
-                    SizedBox(
-                      height: 10,
-                    ),
-                  ]),
-              actions: <Widget>[
-                TextButton(
-                    onPressed: () => Navigator.of(context).pop(),
-                    child: const Text('Ok')),
-              ],
-            );
-          });
+      displayAlerta(context, "Aviso", "Debe haber firma del cliente.");
     }
 
     setState(() {});
@@ -1395,7 +1303,8 @@ class _InstalacionNuevaScreenState extends State<InstalacionNuevaScreen> {
     };
 
     if (!widget.editMode) {
-      Response response = await ApiHelper.postNoToken(
+      //------- Graba AppInstalacionesEquipos CABECERA -----------------
+      Response response = await ApiHelper.post(
           '/api/AppInstalacionesEquipo/PostAppInstalacionesEquipo', request);
       if (!response.isSuccess) {
         await showAlertDialog(
@@ -1406,6 +1315,34 @@ class _InstalacionNuevaScreenState extends State<InstalacionNuevaScreen> {
               const AlertDialogAction(key: null, label: 'Aceptar'),
             ]);
         return;
+      } else {
+        //------- Graba AppInstalacionesEquiposDetalles DETALLE -----------------
+
+        var decodedJson = jsonDecode(response.result);
+
+        for (var serie in _series) {
+          Map<String, dynamic> requestDetalle = {
+            'IDINSTALACIONEQUIPO': decodedJson["idRegistro"],
+            'NROSERIEINSTALADA': serie.nroseriesalida,
+            'IDLOTECAB': serie.nrolotecab,
+            'CODSIAG': serie.codigosiag,
+            'CODSAP': serie.codigosap,
+          };
+          await ApiHelper.post(
+              '/api/AppInstalacionesEquipo/PostAppInstalacionesEquiposDetalle',
+              requestDetalle);
+        }
+
+        //------- Pone Lote DetalleUsado -----------------
+
+        for (var serie in _series) {
+          Map<String, dynamic> requestLoteDetalle = {
+            'NROREGISTRO': serie.nroregistro,
+            'IDInstalacionesEquipos': decodedJson["idRegistro"].toString(),
+          };
+          await ApiHelper.put('/api/LotesDetalles/',
+              serie.nroregistro.toString(), requestLoteDetalle);
+        }
       }
     } else {
       Response response = await ApiHelper.put('/api/AppInstalacionesEquipo/',
@@ -1525,58 +1462,17 @@ class _InstalacionNuevaScreenState extends State<InstalacionNuevaScreen> {
     if (permission == LocationPermission.denied) {
       permission = await Geolocator.requestPermission();
       if (permission == LocationPermission.denied) {
-        showDialog(
-            context: context,
-            builder: (context) {
-              return AlertDialog(
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(10),
-                ),
-                title: const Text('Aviso'),
-                content: Column(
-                    mainAxisSize: MainAxisSize.min,
-                    children: const <Widget>[
-                      Text('El permiso de localización está negado.'),
-                      SizedBox(
-                        height: 10,
-                      ),
-                    ]),
-                actions: <Widget>[
-                  TextButton(
-                      onPressed: () => Navigator.of(context).pop(),
-                      child: const Text('Ok')),
-                ],
-              );
-            });
+        displayAlerta(
+            context, "Aviso", "El permiso de localización está negado.");
+
         return;
       }
     }
 
     if (permission == LocationPermission.deniedForever) {
-      showDialog(
-          context: context,
-          builder: (context) {
-            return AlertDialog(
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(10),
-              ),
-              title: const Text('Aviso'),
-              content: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: const <Widget>[
-                    Text(
-                        'El permiso de localización está negado permanentemente. No se puede requerir este permiso.'),
-                    SizedBox(
-                      height: 10,
-                    ),
-                  ]),
-              actions: <Widget>[
-                TextButton(
-                    onPressed: () => Navigator.of(context).pop(),
-                    child: const Text('Ok')),
-              ],
-            );
-          });
+      displayAlerta(context, "Aviso",
+          "El permiso de localización está negado permanentemente. No se puede requerir este permiso.");
+
       return;
     }
 
@@ -1641,6 +1537,7 @@ class _InstalacionNuevaScreenState extends State<InstalacionNuevaScreen> {
 //---------------------------------------------------------------------------
 
   Future<bool> _validarSerie(String serie) async {
+    _serieConDatos = _serieConDatosVacia;
     setState(() {
       _showLoader = true;
     });
@@ -1674,6 +1571,7 @@ class _InstalacionNuevaScreenState extends State<InstalacionNuevaScreen> {
           actions: <AlertDialogAction>[
             const AlertDialogAction(key: null, label: 'Aceptar'),
           ]);
+
       return false;
     }
 
@@ -1682,10 +1580,43 @@ class _InstalacionNuevaScreenState extends State<InstalacionNuevaScreen> {
       return false;
     }
 
+    _serieConDatos = _serieSinUsar[0];
     setState(() {
       _showLoader = false;
     });
 
     return true;
+  }
+
+//---------------------------------------------------------------------------
+//-------------------------- _validarSerie ----------------------------------
+//---------------------------------------------------------------------------
+  void displayAlerta(BuildContext context, String titulo, String texto) {
+    showDialog(
+        barrierDismissible: false,
+        context: context,
+        builder: (context) {
+          return AlertDialog(
+            title: Text(titulo),
+            elevation: 5,
+            shape:
+                RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
+            content: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Text(texto),
+                const SizedBox(
+                  height: 30,
+                ),
+              ],
+            ),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.pop(context),
+                child: const Text("Ok"),
+              ),
+            ],
+          );
+        });
   }
 }
