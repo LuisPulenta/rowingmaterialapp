@@ -225,16 +225,18 @@ class _InstalacionNuevaScreenState extends State<InstalacionNuevaScreen> {
             const Divider(
               color: Colors.black,
             ),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceAround,
-              children: const [
-                Titulo(
-                  texto: "EQUIPOS INSTALADOS",
-                  color: Color.fromARGB(255, 10, 226, 250),
-                ),
-              ],
-            ),
-            _series.isNotEmpty
+            !widget.editMode
+                ? Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceAround,
+                    children: const [
+                      Titulo(
+                        texto: "EQUIPOS INSTALADOS",
+                        color: Color.fromARGB(255, 10, 226, 250),
+                      ),
+                    ],
+                  )
+                : Container(),
+            ((!widget.editMode) && (_series.isNotEmpty))
                 ? Padding(
                     padding: const EdgeInsets.symmetric(vertical: 5.0),
                     child: Text(
@@ -243,7 +245,7 @@ class _InstalacionNuevaScreenState extends State<InstalacionNuevaScreen> {
                             fontSize: 16, fontWeight: FontWeight.bold)),
                   )
                 : Container(),
-            _series.isEmpty
+            ((!widget.editMode) && (_series.isEmpty))
                 ? const Padding(
                     padding: EdgeInsets.symmetric(vertical: 5),
                     child: Text(
@@ -255,7 +257,7 @@ class _InstalacionNuevaScreenState extends State<InstalacionNuevaScreen> {
                     ),
                   )
                 : SizedBox(height: _series.length * 54, child: _showSeries()),
-            _showSerie(),
+            !widget.editMode ? _showSerie() : Container(),
             const Divider(
               color: Colors.black,
             ),
@@ -1276,7 +1278,7 @@ class _InstalacionNuevaScreenState extends State<InstalacionNuevaScreen> {
       _pedidoShowError = false;
     }
 
-    if (_series.isEmpty) {
+    if ((_series.isEmpty) && (!widget.editMode)) {
       isValid = false;
       displayAlerta(context, "Aviso", "No hay Equipos Registrados.");
     }

@@ -4,3 +4,4 @@ export 'package:rowingmaterialapp/models/tipo_instalacion.dart';
 export 'package:rowingmaterialapp/models/instalacion.dart';
 export 'package:rowingmaterialapp/models/serie_sin_usar.dart';
 export 'package:rowingmaterialapp/models/app_instalaciones_equipo.dart';
+export 'package:rowingmaterialapp/models/app_instalaciones_equipo_detalle.dart';

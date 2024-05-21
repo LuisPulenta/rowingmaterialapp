@@ -1,5 +1,8 @@
+import 'package:adaptive_dialog/adaptive_dialog.dart';
+import 'package:connectivity/connectivity.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:rowingmaterialapp/helpers/helpers.dart';
 import 'package:rowingmaterialapp/models/models.dart';
 import 'package:rowingmaterialapp/widgets/widgets.dart';
 
@@ -24,83 +27,128 @@ class InstalacionDetalleScreen extends StatefulWidget {
 
 class _InstalacionDetalleScreenState extends State<InstalacionDetalleScreen> {
 //---------------------------------------------------------------
+//----------------------- Variables -----------------------------
+//---------------------------------------------------------------
+
+  List<AppInstalacionesEquiposDetalle> _instalacionesDetalles = [];
+
+//---------------------------------------------------------------
+//----------------------- initState -----------------------------
+//---------------------------------------------------------------
+
+  @override
+  void initState() {
+    super.initState();
+    _getSeries();
+  }
+
+//---------------------------------------------------------------
 //----------------------- Pantalla ------------------------------
 //---------------------------------------------------------------
   @override
   Widget build(BuildContext context) {
+    double ancho = MediaQuery.of(context).size.width;
     return Scaffold(
       appBar: AppBar(
         title: Text('Instalación ${widget.instalacion.idRegistro.toString()}'),
         centerTitle: true,
       ),
-      body: Padding(
-        padding: const EdgeInsets.all(8.0),
-        child: Container(
-          color: const Color(0xFFC7C7C8),
-          margin: const EdgeInsets.all(0),
-          padding: const EdgeInsets.all(5),
-          child: Column(
-            children: [
-              CustomRow(
-                nombredato: 'Id Inst.: ',
-                dato: widget.instalacion.idRegistro.toString(),
-              ),
-              CustomRow(
-                nombredato: 'Fecha: ',
-                dato: DateFormat('dd/MM/yyyy')
-                    .format(DateTime.parse(widget.instalacion.fecha!)),
-              ),
-              CustomRow(
-                nombredato: 'N° Obra: ',
-                dato: widget.instalacion.nroObra.toString(),
-              ),
-              CustomRow(
-                nombredato: 'Cliente: ',
-                dato: widget.instalacion.nombreCliente +
-                    ' ' +
-                    widget.instalacion.apellidoCliente,
-              ),
-              CustomRow(
-                nombredato: 'Documento: ',
-                dato: widget.instalacion.domicilioInstalacion,
-              ),
-              CustomRow(
-                nombredato: 'Entre calles: ',
-                dato: widget.instalacion.entreCalles,
-              ),
-              CustomRow(
-                nombredato: 'Tipo Instalación: ',
-                dato: widget.instalacion.tipoInstalacion,
-              ),
-              CustomRow(
-                nombredato: 'Fecha Instalación: ',
-                dato: DateFormat('dd/MM/yyyy').format(
-                    DateTime.parse(widget.instalacion.fechaInstalacion!)),
-              ),
-              CustomRow(
-                nombredato: 'Pedido: ',
-                dato: widget.instalacion.pedido,
-              ),
-              CustomRow(
-                nombredato: 'Firmante.: ',
-                dato: widget.instalacion.nombreApellidoFirmante,
-              ),
-              CustomRow(nombredato: 'Firma: ', dato: ""),
-              const SizedBox(
-                height: 20,
-              ),
-              FadeInImage(
-                fit: BoxFit.contain,
-                placeholder: const AssetImage('assets/loading.gif'),
-                image:
-                    NetworkImage(widget.instalacion.firmaclienteImageFullPath),
-              ),
-              const SizedBox(
-                height: 20,
-              ),
-              _showButton(),
-            ],
-          ),
+      body: SingleChildScrollView(
+        child: Column(
+          children: [
+            const SizedBox(
+              height: 10,
+            ),
+            CustomRow(
+              nombredato: 'Id Inst.: ',
+              dato: widget.instalacion.idRegistro.toString(),
+            ),
+            CustomRow(
+              nombredato: 'Fecha: ',
+              dato: DateFormat('dd/MM/yyyy')
+                  .format(DateTime.parse(widget.instalacion.fecha!)),
+            ),
+            CustomRow(
+              nombredato: 'N° Obra: ',
+              dato: widget.instalacion.nroObra.toString(),
+            ),
+            CustomRow(
+              nombredato: 'Cliente: ',
+              dato: widget.instalacion.nombreCliente +
+                  ' ' +
+                  widget.instalacion.apellidoCliente,
+            ),
+            CustomRow(
+              nombredato: 'Documento: ',
+              dato: widget.instalacion.domicilioInstalacion,
+            ),
+            CustomRow(
+              nombredato: 'Entre calles: ',
+              dato: widget.instalacion.entreCalles,
+            ),
+            CustomRow(
+              nombredato: 'Tipo Instalación: ',
+              dato: widget.instalacion.tipoInstalacion,
+            ),
+            CustomRow(
+              nombredato: 'Fecha Instalación: ',
+              dato: DateFormat('dd/MM/yyyy')
+                  .format(DateTime.parse(widget.instalacion.fechaInstalacion!)),
+            ),
+            CustomRow(
+              nombredato: 'Pedido: ',
+              dato: widget.instalacion.pedido,
+            ),
+            CustomRow(
+              nombredato: 'Firmante.: ',
+              dato: widget.instalacion.nombreApellidoFirmante,
+            ),
+            CustomRow(nombredato: 'Firma: ', dato: ""),
+            const SizedBox(
+              height: 20,
+            ),
+            FadeInImage(
+              fit: BoxFit.contain,
+              placeholder: const AssetImage('assets/loading.gif'),
+              image: NetworkImage(widget.instalacion.firmaclienteImageFullPath),
+            ),
+            const SizedBox(
+              height: 20,
+            ),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceAround,
+              children: const [
+                Titulo(
+                  texto: "EQUIPOS INSTALADOS",
+                  color: Color.fromARGB(255, 10, 226, 250),
+                ),
+              ],
+            ),
+            Padding(
+              padding: const EdgeInsets.symmetric(vertical: 5.0),
+              child: Text(
+                  "Cant. de Equipos instalados: ${_instalacionesDetalles.length}",
+                  style: const TextStyle(
+                      fontSize: 16, fontWeight: FontWeight.bold)),
+            ),
+            const Padding(
+              padding: EdgeInsets.symmetric(vertical: 5.0),
+              child: Text("Lista de N° de Series instalados:",
+                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+            ),
+            _instalacionesDetalles.isNotEmpty
+                ? SizedBox(
+                    height: _instalacionesDetalles.length * 54,
+                    child: _showSeries())
+                : Container(),
+            const SizedBox(
+              height: 20,
+            ),
+            _showButton(),
+            const SizedBox(
+              height: 30,
+            ),
+          ],
         ),
       ),
     );
@@ -148,5 +196,76 @@ class _InstalacionDetalleScreenState extends State<InstalacionDetalleScreen> {
 //-------------------------------------------------------------
   void _volver() {
     Navigator.pop(context, 'yes');
+  }
+
+//------------------------------------------------------------------
+//------------------------------ _getSeries ------------------------
+//------------------------------------------------------------------
+
+  Future<void> _getSeries() async {
+    var connectivityResult = await Connectivity().checkConnectivity();
+    if (connectivityResult == ConnectivityResult.none) {
+      setState(() {});
+      await showAlertDialog(
+          context: context,
+          title: 'Error',
+          message: 'Verifica que estes conectado a internet.',
+          actions: <AlertDialogAction>[
+            const AlertDialogAction(key: null, label: 'Aceptar'),
+          ]);
+      return;
+    }
+
+    Response response =
+        await ApiHelper.getSeries(widget.instalacion.idRegistro);
+
+    if (!response.isSuccess) {
+      await showAlertDialog(
+          context: context,
+          title: 'Error',
+          message: "N° de Instalación no válido",
+          actions: <AlertDialogAction>[
+            const AlertDialogAction(key: null, label: 'Aceptar'),
+          ]);
+
+      setState(() {});
+      return;
+    }
+    _instalacionesDetalles = response.result;
+
+    setState(() {});
+  }
+
+//--------------------------------------------------------------
+//-------------------------- _showSeries ---------------------
+//--------------------------------------------------------------
+
+  Widget _showSeries() {
+    return ListView(
+      children: _instalacionesDetalles.map((e) {
+        return Card(
+          color: const Color.fromARGB(255, 142, 210, 237),
+          shadowColor: Colors.white,
+          elevation: 10,
+          margin: const EdgeInsets.fromLTRB(10, 2, 10, 2),
+          child: Container(
+            height: 50,
+            margin: const EdgeInsets.all(0),
+            padding: const EdgeInsets.all(5),
+            child: Row(
+              children: [
+                Text(
+                  e.nroserieinstalada.toString(),
+                  style: const TextStyle(fontWeight: FontWeight.bold),
+                ),
+                const SizedBox(
+                  width: 5,
+                ),
+              ],
+            ),
+          ),
+        );
+      }).toList(),
+    );
   }
 }

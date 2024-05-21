@@ -357,7 +357,11 @@ class _InstalacionesScreenState extends State<InstalacionesScreen> {
                     Column(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        (e.auditado == 0)
+                        ((e.auditado == 0) &&
+                                (DateTime.parse(e.fecha!)
+                                            .add(Duration(hours: 15)))
+                                        .compareTo(DateTime.now()) >
+                                    0)
                             ? IconButton(
                                 icon: const CircleAvatar(
                                   backgroundColor: Color(0xFF781f1e),
@@ -369,7 +373,11 @@ class _InstalacionesScreenState extends State<InstalacionesScreen> {
                                 },
                               )
                             : Container(),
-                        (e.auditado == 0)
+                        ((e.auditado == 0) &&
+                                (DateTime.parse(e.fecha!)
+                                            .add(Duration(hours: 15)))
+                                        .compareTo(DateTime.now()) >
+                                    0)
                             ? IconButton(
                                 icon: const CircleAvatar(
                                   backgroundColor: Colors.white,
