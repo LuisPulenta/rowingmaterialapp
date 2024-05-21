@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:math' show Random;
 
 import 'package:adaptive_dialog/adaptive_dialog.dart';
 import 'package:connectivity/connectivity.dart';
@@ -902,16 +903,6 @@ class _InstalacionNuevaScreenState extends State<InstalacionNuevaScreen> {
 
                                             // VALIDAR QUE EL NUMERO DE SERIE ESTE DISPONIBLE
 
-                                            isValidSerie =
-                                                await _validarSerie(_serie);
-
-                                            if (!isValidSerie) {
-                                              displayAlerta(context, "Aviso",
-                                                  "N° de Serie no registrado para su Usuario.");
-
-                                              return;
-                                            }
-
                                             _series.forEach((serie) async {
                                               if (serie.nroseriesalida
                                                       .toLowerCase() ==
@@ -928,7 +919,60 @@ class _InstalacionNuevaScreenState extends State<InstalacionNuevaScreen> {
                                               return;
                                             }
 
+                                            isValidSerie =
+                                                await _validarSerie(_serie);
+
+                                            if (!isValidSerie) {
+                                              await showDialog(
+                                                  barrierDismissible: false,
+                                                  context: context,
+                                                  builder: (context) {
+                                                    return AlertDialog(
+                                                      shape:
+                                                          RoundedRectangleBorder(
+                                                        borderRadius:
+                                                            BorderRadius
+                                                                .circular(10),
+                                                      ),
+                                                      title: const Text(''),
+                                                      content: Column(
+                                                          mainAxisSize:
+                                                              MainAxisSize.min,
+                                                          children: const <
+                                                              Widget>[
+                                                            Text(
+                                                                'N° de Serie no registrado para su Usuario. ¿Quiere agregarlo?'),
+                                                            SizedBox(
+                                                              height: 10,
+                                                            ),
+                                                          ]),
+                                                      actions: <Widget>[
+                                                        TextButton(
+                                                            onPressed: () {
+                                                              _serie = "";
+                                                              Navigator.of(
+                                                                      context)
+                                                                  .pop();
+                                                              return;
+                                                            },
+                                                            child: const Text(
+                                                                'NO')),
+                                                        TextButton(
+                                                            onPressed: () {
+                                                              Navigator.of(
+                                                                      context)
+                                                                  .pop();
+                                                              return;
+                                                            },
+                                                            child: const Text(
+                                                                'SI')),
+                                                      ],
+                                                    );
+                                                  });
+                                            }
+
                                             if (_serie.isNotEmpty) {
+                                              final random = Random();
                                               _series.add(_serieConDatos);
                                               _serie = '';
                                               setState(() {});
@@ -1576,7 +1620,16 @@ class _InstalacionNuevaScreenState extends State<InstalacionNuevaScreen> {
     }
 
     _serieSinUsar = response.result;
-    if (_serieSinUsar.length == 0) {
+    if (_serieSinUsar.isEmpty) {
+      _serieConDatos = SerieSinUsar(
+          nroregistro: 0,
+          nrolotecab: 0,
+          grupoh: '',
+          causanteh: '',
+          nroseriesalida: _serie,
+          codigosiag: '',
+          codigosap: '',
+          denominacion: "Equipo No Registrado");
       return false;
     }
 

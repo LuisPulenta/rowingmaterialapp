@@ -549,6 +549,7 @@ class _InstalacionesScreenState extends State<InstalacionesScreen> {
 
   _borrarInstalacion(Instalacion e) async {
     await showDialog(
+        barrierDismissible: false,
         context: context,
         builder: (context) {
           return AlertDialog(
