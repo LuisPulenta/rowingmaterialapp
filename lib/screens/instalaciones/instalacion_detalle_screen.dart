@@ -261,6 +261,13 @@ class _InstalacionDetalleScreenState extends State<InstalacionDetalleScreen> {
                 const SizedBox(
                   width: 5,
                 ),
+                e.nombreEquipo!.length > 25
+                    ? Text(
+                        e.nombreEquipo!.substring(0, 25),
+                      )
+                    : Text(
+                        e.nombreEquipo!,
+                      ),
               ],
             ),
           ),

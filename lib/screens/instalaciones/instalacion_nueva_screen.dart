@@ -1267,15 +1267,13 @@ class _InstalacionNuevaScreenState extends State<InstalacionNuevaScreen> {
       _pedidoShowError = true;
       _pedidoError = 'Ingrese Pedido';
     } else {
-      _pedidoShowError = false;
-    }
-
-    if (_pedido.length > 11) {
-      isValid = false;
-      _pedidoShowError = true;
-      _pedidoError = 'Pedido no puede contener más de 11 caracteres';
-    } else {
-      _pedidoShowError = false;
+      if (_pedido.length > 11) {
+        isValid = false;
+        _pedidoShowError = true;
+        _pedidoError = 'Pedido no puede contener más de 11 caracteres';
+      } else {
+        _pedidoShowError = false;
+      }
     }
 
     if ((_series.isEmpty) && (!widget.editMode)) {
@@ -1373,6 +1371,9 @@ class _InstalacionNuevaScreenState extends State<InstalacionNuevaScreen> {
             'IDLOTECAB': serie.nrolotecab,
             'CODSIAG': serie.codigosiag,
             'CODSAP': serie.codigosap,
+            'NombreEquipo': serie.denominacion,
+            'NROREGISTROLOTESCAB': serie.nroregistro,
+            'LinkFoto': '',
           };
           await ApiHelper.post(
               '/api/AppInstalacionesEquipo/PostAppInstalacionesEquiposDetalle',
@@ -1383,6 +1384,7 @@ class _InstalacionNuevaScreenState extends State<InstalacionNuevaScreen> {
 
         for (var serie in _series) {
           Map<String, dynamic> requestLoteDetalle = {
+            'MARCAR': 1,
             'NROREGISTRO': serie.nroregistro,
             'IDInstalacionesEquipos': decodedJson["idRegistro"].toString(),
           };
@@ -1617,7 +1619,7 @@ class _InstalacionNuevaScreenState extends State<InstalacionNuevaScreen> {
           actions: <AlertDialogAction>[
             const AlertDialogAction(key: null, label: 'Aceptar'),
           ]);
-
+      _showLoader = false;
       return false;
     }
 
@@ -1632,6 +1634,7 @@ class _InstalacionNuevaScreenState extends State<InstalacionNuevaScreen> {
           codigosiag: '',
           codigosap: '',
           denominacion: "Equipo No Registrado");
+      _showLoader = false;
       return false;
     }
 

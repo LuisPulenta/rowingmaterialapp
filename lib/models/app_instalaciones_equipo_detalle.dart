@@ -5,6 +5,10 @@ class AppInstalacionesEquiposDetalle {
   int? idlotecab = 0;
   String? codsiag = '';
   String? codsap = '';
+  String? nombreEquipo = '';
+  String? linkFoto = '';
+  int? nroregistrolotescab = 0;
+  String? imageFullPath = '';
 
   AppInstalacionesEquiposDetalle(
       {required this.iddetalle,
@@ -12,7 +16,11 @@ class AppInstalacionesEquiposDetalle {
       required this.nroserieinstalada,
       required this.idlotecab,
       required this.codsiag,
-      required this.codsap});
+      required this.codsap,
+      required this.nombreEquipo,
+      required this.linkFoto,
+      required this.nroregistrolotescab,
+      required this.imageFullPath});
 
   AppInstalacionesEquiposDetalle.fromJson(Map<String, dynamic> json) {
     iddetalle = json['iddetalle'];
@@ -21,16 +29,24 @@ class AppInstalacionesEquiposDetalle {
     idlotecab = json['idlotecab'];
     codsiag = json['codsiag'];
     codsap = json['codsap'];
+    nombreEquipo = json['nombreEquipo'];
+    linkFoto = json['linkFoto'];
+    nroregistrolotescab = json['nroregistrolotescab'];
+    imageFullPath = json['imageFullPath'];
   }
 
   Map<String, dynamic> toJson() {
     final Map<String, dynamic> data = new Map<String, dynamic>();
-    data['iddetalle'] = this.iddetalle;
-    data['idinstalacionequipo'] = this.idinstalacionequipo;
-    data['nroserieinstalada'] = this.nroserieinstalada;
-    data['idlotecab'] = this.idlotecab;
-    data['codsiag'] = this.codsiag;
-    data['codsap'] = this.codsap;
+    data['iddetalle'] = iddetalle;
+    data['idinstalacionequipo'] = idinstalacionequipo;
+    data['nroserieinstalada'] = nroserieinstalada;
+    data['idlotecab'] = idlotecab;
+    data['codsiag'] = codsiag;
+    data['codsap'] = codsap;
+    data['nombreEquipo'] = nombreEquipo;
+    data['linkFoto'] = linkFoto;
+    data['nroregistrolotescab'] = nroregistrolotescab;
+    data['imageFullPath'] = imageFullPath;
     return data;
   }
 }

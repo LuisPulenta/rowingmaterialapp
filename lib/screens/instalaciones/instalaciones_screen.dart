@@ -24,6 +24,8 @@ class _InstalacionesScreenState extends State<InstalacionesScreen> {
 //---------------------------------------------------------------
 
   List<Instalacion> _instalaciones = [];
+  List<AppInstalacionesEquiposDetalle> _instalacionDetalles = [];
+
   bool _showLoader = false;
 //---------------------------------------------------------------
 //----------------------- initState -----------------------------
@@ -580,10 +582,30 @@ class _InstalacionesScreenState extends State<InstalacionesScreen> {
                   child: const Text('NO')),
               TextButton(
                   onPressed: () async {
+                    //---------- Trae Lista de Detalle ----------
+                    await _getInstalacionesDetalles(e.idRegistro);
+
+                    //---------- Actualiza Lotes ----------
+                    for (var serie in _instalacionDetalles) {
+                      if (serie.idlotecab != 0) {
+                        Map<String, dynamic> requestLoteDetalle = {
+                          'MARCAR': 0,
+                          'NROREGISTRO': serie.nroregistrolotescab,
+                          'IDInstalacionesEquipos': null,
+                        };
+                        await ApiHelper.put(
+                            '/api/LotesDetalles/',
+                            serie.nroregistrolotescab.toString(),
+                            requestLoteDetalle);
+                      }
+                    }
+
+                    //---------- Borra Cabecera y Detalle Instalación ----------
                     Response response = await ApiHelper.delete(
                         '/api/AppInstalacionesEquipo/',
                         e.idRegistro.toString());
 
+                    //---------- Refresca Lista ----------
                     _getInstalaciones();
 
                     setState(() {});
@@ -613,5 +635,54 @@ class _InstalacionesScreenState extends State<InstalacionesScreen> {
       _getInstalaciones();
       setState(() {});
     }
+  }
+
+//-----------------------------------------------------------------
+//--------------------- _getInstalacionesDetalles -----------------
+//-----------------------------------------------------------------
+
+  Future<void> _getInstalacionesDetalles(int idInstalacion) async {
+    setState(() {
+      _showLoader = true;
+    });
+
+    var connectivityResult = await Connectivity().checkConnectivity();
+
+    if (connectivityResult == ConnectivityResult.none) {
+      setState(() {
+        _showLoader = false;
+      });
+      await showAlertDialog(
+          context: context,
+          title: 'Error',
+          message: 'Verifica que estés conectado a Internet',
+          actions: <AlertDialogAction>[
+            const AlertDialogAction(key: null, label: 'Aceptar'),
+          ]);
+      return;
+    }
+
+    Response response = Response(isSuccess: false);
+
+    response = await ApiHelper.getSeries(idInstalacion);
+
+    setState(() {
+      _showLoader = false;
+    });
+
+    if (!response.isSuccess) {
+      await showAlertDialog(
+          context: context,
+          title: 'Error',
+          message: response.message,
+          actions: <AlertDialogAction>[
+            const AlertDialogAction(key: null, label: 'Aceptar'),
+          ]);
+      return;
+    }
+
+    setState(() {
+      _instalacionDetalles = response.result;
+    });
   }
 }
