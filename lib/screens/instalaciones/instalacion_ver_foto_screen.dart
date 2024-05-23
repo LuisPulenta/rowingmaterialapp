@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:cached_network_image/cached_network_image.dart';
 
 import 'dart:convert';
 import 'dart:typed_data';
@@ -28,11 +29,23 @@ class _InstalacionVerFotoScreenState extends State<InstalacionVerFotoScreen> {
             children: [
               Padding(
                 padding: const EdgeInsets.all(5.0),
-                child: Image.memory(
-                  width: ancho,
-                  scale: 0.5,
-                  const Base64Decoder().convert(widget.foto),
-                ),
+                child: widget.foto.contains('http') == true
+                    ? CachedNetworkImage(
+                        imageUrl: widget.foto,
+                        errorWidget: (context, url, error) =>
+                            const Icon(Icons.error),
+                        fit: BoxFit.cover,
+                        width: ancho,
+                        placeholder: (context, url) => Image(
+                          image: const AssetImage('assets/loading.gif'),
+                          fit: BoxFit.cover,
+                        ),
+                      )
+                    : Image.memory(
+                        width: ancho,
+                        scale: 0.5,
+                        const Base64Decoder().convert(widget.foto),
+                      ),
               ),
               const Spacer(),
               ElevatedButton(

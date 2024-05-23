@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:rowingmaterialapp/helpers/helpers.dart';
 import 'package:rowingmaterialapp/models/models.dart';
+import 'package:rowingmaterialapp/screens/screens.dart';
 import 'package:rowingmaterialapp/widgets/widgets.dart';
 
 class InstalacionDetalleScreen extends StatefulWidget {
@@ -268,6 +269,23 @@ class _InstalacionDetalleScreenState extends State<InstalacionDetalleScreen> {
                     : Text(
                         e.nombreEquipo!,
                       ),
+                const Spacer(),
+                (e.linkFoto != null && e.linkFoto != '')
+                    ? IconButton(
+                        onPressed: () async {
+                          Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                  builder: (context) =>
+                                      InstalacionVerFotoScreen(
+                                          foto: e.imageFullPath!)));
+                        },
+                        icon: const Icon(
+                          Icons.photo_camera,
+                          color: Color.fromARGB(255, 58, 204, 39),
+                        ),
+                      )
+                    : Container(),
               ],
             ),
           ),
