@@ -37,10 +37,10 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Rowing Material App'),
-        centerTitle: true,
-      ),
+      // appBar: AppBar(
+      //   title: const Text('Rowing Material App'),
+      //   centerTitle: true,
+      // ),
       body: _getBody(),
     );
   }
@@ -66,6 +66,9 @@ class _HomeScreenState extends State<HomeScreen> {
         ),
         child: Column(
           children: [
+            SizedBox(
+              height: 60,
+            ),
             Image.asset(
               "assets/logo.png",
               height: 50,

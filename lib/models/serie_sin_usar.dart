@@ -7,6 +7,7 @@ class SerieSinUsar {
   String codigosiag = '';
   String codigosap = '';
   String? denominacion = '';
+  String? foto = '';
 
   SerieSinUsar(
       {required this.nroregistro,
@@ -16,7 +17,8 @@ class SerieSinUsar {
       required this.nroseriesalida,
       required this.codigosiag,
       required this.codigosap,
-      required this.denominacion});
+      required this.denominacion,
+      required this.foto});
 
   SerieSinUsar.fromJson(Map<String, dynamic> json) {
     nroregistro = json['nroregistro'];
@@ -27,18 +29,20 @@ class SerieSinUsar {
     codigosiag = json['codigosiag'];
     codigosap = json['codigosap'];
     denominacion = json['denominacion'];
+    foto = json['foto'];
   }
 
   Map<String, dynamic> toJson() {
     final Map<String, dynamic> data = new Map<String, dynamic>();
-    data['nroregistro'] = this.nroregistro;
-    data['nrolotecab'] = this.nrolotecab;
-    data['grupoh'] = this.grupoh;
-    data['causanteh'] = this.causanteh;
-    data['nroseriesalida'] = this.nroseriesalida;
-    data['codigosiag'] = this.codigosiag;
-    data['codigosap'] = this.codigosap;
-    data['denominacion'] = this.denominacion;
+    data['nroregistro'] = nroregistro;
+    data['nrolotecab'] = nrolotecab;
+    data['grupoh'] = grupoh;
+    data['causanteh'] = causanteh;
+    data['nroseriesalida'] = nroseriesalida;
+    data['codigosiag'] = codigosiag;
+    data['codigosap'] = codigosap;
+    data['denominacion'] = denominacion;
+    data['foto'] = foto;
     return data;
   }
 }

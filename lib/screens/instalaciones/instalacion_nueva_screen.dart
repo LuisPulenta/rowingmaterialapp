@@ -13,6 +13,7 @@ import 'package:rowingmaterialapp/models/models.dart';
 import 'package:rowingmaterialapp/screens/screens.dart';
 import 'package:geocoding/geocoding.dart';
 import 'package:rowingmaterialapp/widgets/widgets.dart';
+import 'package:camera/camera.dart';
 
 class InstalacionNuevaScreen extends StatefulWidget {
   final User user;
@@ -41,6 +42,9 @@ class _InstalacionNuevaScreenState extends State<InstalacionNuevaScreen> {
   bool _signatureChanged = false;
   late ByteData? _signature;
 
+  bool _photoChanged = false;
+  late XFile _image;
+
   bool isValidSerie = false;
   bool existeSerie = false;
   List<SerieSinUsar> _serieSinUsar = [];
@@ -53,7 +57,8 @@ class _InstalacionNuevaScreenState extends State<InstalacionNuevaScreen> {
       nroseriesalida: '',
       codigosiag: '',
       codigosap: '',
-      denominacion: '');
+      denominacion: '',
+      foto: '');
 
   AppInstalacionesEquipo appInstalacionesEquipo = AppInstalacionesEquipo(
       idRegistro: 0,
@@ -87,7 +92,8 @@ class _InstalacionNuevaScreenState extends State<InstalacionNuevaScreen> {
       nroseriesalida: '',
       codigosiag: '',
       codigosap: '',
-      denominacion: '');
+      denominacion: '',
+      foto: '');
 
   String _serie = '';
 
@@ -325,14 +331,38 @@ class _InstalacionNuevaScreenState extends State<InstalacionNuevaScreen> {
                 const SizedBox(
                   width: 5,
                 ),
-                e.denominacion!.length > 25
+                e.denominacion!.length > 20
                     ? Text(
-                        e.denominacion!.substring(0, 25),
+                        e.denominacion!.substring(0, 20),
                       )
                     : Text(
                         e.denominacion!,
                       ),
                 const Spacer(),
+                e.foto == null
+                    ? IconButton(
+                        onPressed: () async {
+                          e.foto = await _takePicture();
+                          setState(() {});
+                        },
+                        icon: const Icon(
+                          Icons.add_a_photo,
+                          color: Color(0xFF781f1e),
+                        ),
+                      )
+                    : IconButton(
+                        onPressed: () async {
+                          Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                  builder: (context) =>
+                                      InstalacionVerFotoScreen(foto: e.foto!)));
+                        },
+                        icon: const Icon(
+                          Icons.photo_camera,
+                          color: Color.fromARGB(255, 58, 204, 39),
+                        ),
+                      ),
                 IconButton(
                   onPressed: () {
                     _series.remove(e);
@@ -974,7 +1004,7 @@ class _InstalacionNuevaScreenState extends State<InstalacionNuevaScreen> {
                                             }
 
                                             if (_serie.isNotEmpty) {
-                                              final random = Random();
+                                              _serieConDatos.foto = null;
                                               _series.add(_serieConDatos);
                                               _serie = '';
                                               setState(() {});
@@ -1633,7 +1663,8 @@ class _InstalacionNuevaScreenState extends State<InstalacionNuevaScreen> {
           nroseriesalida: _serie,
           codigosiag: '',
           codigosap: '',
-          denominacion: "Equipo No Registrado");
+          denominacion: "Equipo No Registrado",
+          foto: '');
       _showLoader = false;
       return false;
     }
@@ -1676,5 +1707,29 @@ class _InstalacionNuevaScreenState extends State<InstalacionNuevaScreen> {
             ],
           );
         });
+  }
+
+//--------------------------------------------------------------
+//-------------------------- _takePicture ----------------------
+//--------------------------------------------------------------
+
+  Future<String> _takePicture() async {
+    WidgetsFlutterBinding.ensureInitialized();
+    final cameras = await availableCameras();
+    var firstCamera = cameras.first;
+    Response? response = await Navigator.push(
+        context,
+        MaterialPageRoute(
+            builder: (context) => SacarFotoScreen(
+                  camera: firstCamera,
+                )));
+    if (response != null) {
+      _photoChanged = true;
+      _image = response.result;
+      List<int> imageBytes = await _image.readAsBytes();
+      return base64Encode(imageBytes);
+    } else {
+      return "";
+    }
   }
 }
