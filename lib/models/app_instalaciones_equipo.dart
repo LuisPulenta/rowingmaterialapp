@@ -3,24 +3,28 @@ class AppInstalacionesEquipo {
   int nroObra = 0;
   int idUsuario = 0;
   String? imei = '';
-  String? fecha = '';
-  String? latitud = '';
-  String? longitud = '';
-  String? fechaInstalacion = '';
-  String? grupo = '';
-  String? causante = '';
-  String? pedido = '';
-  String? nombreCliente = '';
-  String? apellidoCliente = '';
-  String? documento = '';
-  String? domicilioInstalacion = '';
-  String? entreCalles = '';
-  String? firmacliente = '';
-  String? nombreApellidoFirmante = '';
-  String? tipoInstalacion = '';
-  String? esAveria = '';
+  String fecha = '';
+  String latitud = '';
+  String longitud = '';
+  String fechaInstalacion = '';
+  String grupo = '';
+  String causante = '';
+  String pedido = '';
+  String nombreCliente = '';
+  String apellidoCliente = '';
+  String documento = '';
+  String domicilioInstalacion = '';
+  String entreCalles = '';
+  String firmacliente = '';
+  String nombreApellidoFirmante = '';
+  String tipoInstalacion = '';
+  String esAveria = '';
+  String documentoFirmante = '';
+  int? mismoFirmante = 0;
+  String tipoPedido = '';
+
   int? auditado = 0;
-  String? firmaclienteImageFullPath = '';
+  String firmaclienteImageFullPath = '';
 
   AppInstalacionesEquipo(
       {required this.idRegistro,
@@ -44,7 +48,10 @@ class AppInstalacionesEquipo {
       required this.tipoInstalacion,
       required this.esAveria,
       required this.auditado,
-      required this.firmaclienteImageFullPath});
+      required this.firmaclienteImageFullPath,
+      required this.documentoFirmante,
+      required this.mismoFirmante,
+      required this.tipoPedido});
 
   AppInstalacionesEquipo.fromJson(Map<String, dynamic> json) {
     idRegistro = json['idRegistro'];
@@ -69,6 +76,9 @@ class AppInstalacionesEquipo {
     esAveria = json['esAveria'];
     auditado = json['auditado'];
     firmaclienteImageFullPath = json['firmaclienteImageFullPath'];
+    documentoFirmante = json['documentoFirmante'];
+    mismoFirmante = json['mismoFirmante'];
+    tipoPedido = json['tipoPedido'];
   }
 
   Map<String, dynamic> toJson() {
@@ -95,6 +105,9 @@ class AppInstalacionesEquipo {
     data['esAveria'] = esAveria;
     data['auditado'] = auditado;
     data['firmaclienteImageFullPath'] = firmaclienteImageFullPath;
+    data['documentoFirmante'] = documentoFirmante;
+    data['mismoFirmante'] = mismoFirmante;
+    data['tipoPedido'] = tipoPedido;
     return data;
   }
 }

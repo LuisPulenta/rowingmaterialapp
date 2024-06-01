@@ -98,11 +98,11 @@ class ApiHelper {
       return Response(isSuccess: false, message: body);
     }
 
-    List<Instalacion> list = [];
+    List<AppInstalacionesEquipo> list = [];
     var decodedJson = jsonDecode(body);
     if (decodedJson != null) {
       for (var item in decodedJson) {
-        list.add(Instalacion.fromJson(item));
+        list.add(AppInstalacionesEquipo.fromJson(item));
       }
     }
     return Response(isSuccess: true, result: list);

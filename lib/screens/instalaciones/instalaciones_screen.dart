@@ -23,7 +23,7 @@ class _InstalacionesScreenState extends State<InstalacionesScreen> {
 //----------------------- Variables -----------------------------
 //---------------------------------------------------------------
 
-  List<Instalacion> _instalaciones = [];
+  List<AppInstalacionesEquipo> _instalaciones = [];
   List<AppInstalacionesEquiposDetalle> _instalacionDetalles = [];
 
   bool _showLoader = false;
@@ -449,7 +449,7 @@ class _InstalacionesScreenState extends State<InstalacionesScreen> {
           user: widget.user,
           imei: widget.imei,
           editMode: false,
-          instalacion: Instalacion(
+          instalacion: AppInstalacionesEquipo(
               idRegistro: 0,
               nroObra: 0,
               idUsuario: 0,
@@ -471,7 +471,10 @@ class _InstalacionesScreenState extends State<InstalacionesScreen> {
               tipoInstalacion: '',
               esAveria: '',
               auditado: 0,
-              firmaclienteImageFullPath: ''),
+              firmaclienteImageFullPath: '',
+              documentoFirmante: '',
+              mismoFirmante: 0,
+              tipoPedido: ''),
         ),
       ),
     );
@@ -539,7 +542,7 @@ class _InstalacionesScreenState extends State<InstalacionesScreen> {
 //--------------------- _goInfoInstalacion ------------------------
 //-----------------------------------------------------------------
 
-  void _goInfoInstalacion(Instalacion e) async {
+  void _goInfoInstalacion(AppInstalacionesEquipo e) async {
     await Navigator.push(
       context,
       MaterialPageRoute(
@@ -557,7 +560,7 @@ class _InstalacionesScreenState extends State<InstalacionesScreen> {
 //-------------------- _borrarInstalacion -------------------------
 //-----------------------------------------------------------------
 
-  _borrarInstalacion(Instalacion e) async {
+  _borrarInstalacion(AppInstalacionesEquipo e) async {
     await showDialog(
         barrierDismissible: false,
         context: context,
@@ -621,7 +624,7 @@ class _InstalacionesScreenState extends State<InstalacionesScreen> {
 //----------------- _editInstalacion ----------------------------
 //---------------------------------------------------------------
 
-  void _editInstalacion(Instalacion e) async {
+  void _editInstalacion(AppInstalacionesEquipo e) async {
     String? result = await Navigator.push(
         context,
         MaterialPageRoute(

@@ -19,7 +19,7 @@ class InstalacionNuevaScreen extends StatefulWidget {
   final User user;
   final String imei;
   final bool editMode;
-  final Instalacion instalacion;
+  final AppInstalacionesEquipo instalacion;
 
   const InstalacionNuevaScreen(
       {Key? key,
@@ -44,6 +44,9 @@ class _InstalacionNuevaScreenState extends State<InstalacionNuevaScreen> {
 
   bool _photoChanged = false;
   late XFile _image;
+
+  bool _coincideFirmante = false;
+  int _tipoPedido = 0;
 
   bool isValidSerie = false;
   bool existeSerie = false;
@@ -82,7 +85,10 @@ class _InstalacionNuevaScreenState extends State<InstalacionNuevaScreen> {
       tipoInstalacion: '',
       esAveria: '',
       auditado: 0,
-      firmaclienteImageFullPath: '');
+      firmaclienteImageFullPath: '',
+      documentoFirmante: '',
+      mismoFirmante: 0,
+      tipoPedido: '');
 
   final SerieSinUsar _serieConDatosVacia = SerieSinUsar(
       nroregistro: 0,
@@ -124,6 +130,11 @@ class _InstalacionNuevaScreenState extends State<InstalacionNuevaScreen> {
   String _signnameError = '';
   bool _signnameShowError = false;
   TextEditingController _signnameController = TextEditingController();
+
+  String _signdocument = '';
+  String _signdocumentError = '';
+  bool _signdocumentShowError = false;
+  TextEditingController _signdocumentController = TextEditingController();
 
   DateTime? fechaInstalacion;
 
@@ -226,6 +237,7 @@ class _InstalacionNuevaScreenState extends State<InstalacionNuevaScreen> {
             ),
             _showTiposInstalacion(),
             _showFechaInstalacion(),
+            _showTipoPedido(),
             _showPedido(),
             _showAveria(),
             const Divider(
@@ -287,6 +299,8 @@ class _InstalacionNuevaScreenState extends State<InstalacionNuevaScreen> {
               ],
             ),
             _showButtonsFirma(ancho),
+            _showCoinncideFirmante(),
+            _showSignDocument(),
             _showSignName(),
             const Divider(
               color: Colors.black,
@@ -696,6 +710,46 @@ class _InstalacionNuevaScreenState extends State<InstalacionNuevaScreen> {
         fechaInstalacion = selected;
       });
     }
+  }
+
+//--------------------------------------------------------------
+//-------------------------- _showTipoPedido -------------------
+//--------------------------------------------------------------
+
+  Widget _showTipoPedido() {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+      child: Row(
+        children: [
+          Expanded(
+            child: RadioListTile(
+              activeColor: const Color(0xFF781f1e),
+              title: const Text('OMS'),
+              value: 0,
+              groupValue: _tipoPedido,
+              onChanged: (value) {
+                setState(() {
+                  _tipoPedido = value!;
+                });
+              },
+            ),
+          ),
+          Expanded(
+            child: RadioListTile(
+              activeColor: const Color(0xFF781f1e),
+              title: const Text('SOM'),
+              value: 1,
+              groupValue: _tipoPedido,
+              onChanged: (value) {
+                setState(() {
+                  _tipoPedido = value!;
+                });
+              },
+            ),
+          ),
+        ],
+      ),
+    );
   }
 
 //--------------------------------------------------------------
@@ -1155,6 +1209,145 @@ class _InstalacionNuevaScreenState extends State<InstalacionNuevaScreen> {
         _signature = response.result;
       });
     }
+  }
+
+//--------------------------------------------------------------
+//-------------------------- _showCoinncideFirmante -----------
+//--------------------------------------------------------------
+  _showCoinncideFirmante() {
+    return CheckboxListTile(
+      title: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: const [
+          Text('Coincide con el Cliente'),
+        ],
+      ),
+      value: _coincideFirmante,
+      activeColor: Colors.blue,
+      onChanged: (value) {
+        if (value == true) {
+          _signdocument = _document;
+          _signdocumentController.text = _documentController.text;
+          _signname =
+              _firstnameController.text != "" ? "$_firstname $_lastname" : "";
+          _signnameController.text = _firstnameController.text != ""
+              ? "${_firstnameController.text} ${_lastnameController.text}"
+              : "";
+        } else {
+          _signdocument = "";
+          _signdocumentController.text = "";
+          _signname = "";
+          _signnameController.text = "";
+        }
+
+        setState(() {
+          _coincideFirmante = value!;
+        });
+      },
+    );
+  }
+
+//--------------------------------------------------------------
+//-------------------------- _showSignDocument -----------------
+//--------------------------------------------------------------
+
+  Widget _showSignDocument() {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+      child: Row(
+        children: [
+          Expanded(
+            child: TextField(
+              controller: _signdocumentController,
+              keyboardType: TextInputType.number,
+              decoration: InputDecoration(
+                  fillColor:
+                      _signdocument == "" ? Colors.yellow[200] : Colors.white,
+                  filled: true,
+                  enabled: true,
+                  hintText: 'Ingresa documento firmante...',
+                  labelText: 'Documento firmante',
+                  errorText: _signdocumentShowError ? _signdocumentError : null,
+                  suffixIcon: const Icon(Icons.assignment_ind),
+                  border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(10))),
+              onChanged: (value) {
+                _signdocument = value;
+              },
+            ),
+          ),
+          const SizedBox(width: 10),
+          ElevatedButton(
+              style: ElevatedButton.styleFrom(
+                backgroundColor: const Color(0xFF781f1e),
+                minimumSize: const Size(50, 40),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(5),
+                ),
+              ),
+              onPressed: () async {
+                String barcodeScanRes;
+                try {
+                  barcodeScanRes = await FlutterBarcodeScanner.scanBarcode(
+                      '#3D8BEF', 'Cancelar', false, ScanMode.DEFAULT);
+                } on PlatformException {
+                  barcodeScanRes = 'Error';
+                }
+                if (barcodeScanRes == '-1') {
+                  return;
+                }
+
+                int cantArrobas = 0;
+                int arroba1 = 0;
+                int arroba2 = 0;
+                int arroba3 = 0;
+                int arroba4 = 0;
+                int arroba5 = 0;
+
+                for (int c = 0; c <= barcodeScanRes.length - 1; c++) {
+                  if (barcodeScanRes[c] == "@") {
+                    cantArrobas++;
+
+                    if (arroba4 != 0 && arroba5 == 0) {
+                      arroba5 = c;
+                    }
+                    if (arroba3 != 0 && arroba4 == 0) {
+                      arroba4 = c;
+                    }
+                    if (arroba2 != 0 && arroba3 == 0) {
+                      arroba3 = c;
+                    }
+
+                    if (arroba1 != 0 && arroba2 == 0) {
+                      arroba2 = c;
+                    }
+                    if (arroba1 == 0) {
+                      arroba1 = c;
+                    }
+                  }
+                }
+
+                if (cantArrobas < 6) {
+                  _signdocumentController.text = "";
+                  _signnameController.text = "";
+                } else {
+                  _signdocumentController.text =
+                      barcodeScanRes.substring(arroba4 + 1, arroba5);
+
+                  _signdocument =
+                      barcodeScanRes.substring(arroba4 + 1, arroba5);
+
+                  _signnameController.text =
+                      '${barcodeScanRes.substring(arroba1 + 1, arroba2)} ${barcodeScanRes.substring(arroba2 + 1, arroba3)}';
+
+                  _signname =
+                      '${barcodeScanRes.substring(arroba1 + 1, arroba2)} ${barcodeScanRes.substring(arroba2 + 1, arroba3)}';
+                }
+              },
+              child: const Icon(Icons.qr_code_2)),
+        ],
+      ),
+    );
   }
 
 //--------------------------------------------------------------

@@ -11,7 +11,7 @@ class InstalacionDetalleScreen extends StatefulWidget {
   final User user;
   final String imei;
   final bool editMode;
-  final Instalacion instalacion;
+  final AppInstalacionesEquipo instalacion;
 
   const InstalacionDetalleScreen(
       {Key? key,
