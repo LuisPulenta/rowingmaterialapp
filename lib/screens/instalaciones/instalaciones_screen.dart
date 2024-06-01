@@ -53,13 +53,15 @@ class _InstalacionesScreenState extends State<InstalacionesScreen> {
             ? const LoaderComponent(text: 'Por favor espere...')
             : _getContent(),
       ),
+      floatingActionButtonLocation:
+          FloatingActionButtonLocation.miniCenterFloat,
       floatingActionButton: FloatingActionButton(
+        backgroundColor: const Color(0xFF781f1e),
+        onPressed: () => _addInstalacion(),
         child: const Icon(
           Icons.add,
           size: 38,
         ),
-        backgroundColor: const Color(0xFF781f1e),
-        onPressed: () => _addInstalacion(),
       ),
     );
   }
@@ -130,6 +132,7 @@ class _InstalacionesScreenState extends State<InstalacionesScreen> {
     return RefreshIndicator(
       onRefresh: _getInstalaciones,
       child: ListView(
+        physics: const BouncingScrollPhysics(),
         children: _instalaciones.map((e) {
           return Card(
             color: const Color(0xFFC7C7C8),
@@ -344,7 +347,7 @@ class _InstalacionesScreenState extends State<InstalacionesScreen> {
                                     ),
                                     Row(
                                       children: [
-                                        Text(e.pedido,
+                                        Text(e.tipoPedido + e.pedido,
                                             style: const TextStyle(
                                               fontSize: 12,
                                             )),

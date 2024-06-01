@@ -98,11 +98,15 @@ class _InstalacionDetalleScreenState extends State<InstalacionDetalleScreen> {
             ),
             CustomRow(
               nombredato: 'Pedido: ',
-              dato: widget.instalacion.pedido,
+              dato: widget.instalacion.tipoPedido + widget.instalacion.pedido,
             ),
             CustomRow(
               nombredato: 'Firmante.: ',
               dato: widget.instalacion.nombreApellidoFirmante,
+            ),
+            CustomRow(
+              nombredato: 'Doc. Firmante.: ',
+              dato: widget.instalacion.documentoFirmante,
             ),
             CustomRow(nombredato: 'Firma: ', dato: ""),
             const SizedBox(

@@ -1,5 +1,4 @@
 import 'dart:convert';
-import 'dart:math' show Random;
 
 import 'package:adaptive_dialog/adaptive_dialog.dart';
 import 'package:connectivity/connectivity.dart';
@@ -723,6 +722,7 @@ class _InstalacionNuevaScreenState extends State<InstalacionNuevaScreen> {
         children: [
           Expanded(
             child: RadioListTile(
+              selected: _tipoPedido == 1,
               activeColor: const Color(0xFF781f1e),
               title: const Text('OMS'),
               value: 0,
@@ -736,6 +736,7 @@ class _InstalacionNuevaScreenState extends State<InstalacionNuevaScreen> {
           ),
           Expanded(
             child: RadioListTile(
+              selected: _tipoPedido == 0,
               activeColor: const Color(0xFF781f1e),
               title: const Text('SOM'),
               value: 1,
@@ -1490,10 +1491,10 @@ class _InstalacionNuevaScreenState extends State<InstalacionNuevaScreen> {
       _pedidoShowError = true;
       _pedidoError = 'Ingrese Pedido';
     } else {
-      if (_pedido.length > 11) {
+      if (_pedido.length > 11 || _pedido.length < 8) {
         isValid = false;
         _pedidoShowError = true;
-        _pedidoError = 'Pedido no puede contener más de 11 caracteres';
+        _pedidoError = 'Pedido debe contener entre 8 y 11 caracteres';
       } else {
         _pedidoShowError = false;
       }
@@ -1507,6 +1508,22 @@ class _InstalacionNuevaScreenState extends State<InstalacionNuevaScreen> {
     if (_signature == null && !widget.editMode) {
       isValid = false;
       displayAlerta(context, "Aviso", "Debe haber firma del cliente.");
+    }
+
+    if (_signdocument == "") {
+      isValid = false;
+      _signdocumentShowError = true;
+      _signdocumentError = 'Ingrese un Documento del Firmante';
+    } else {
+      _signdocumentShowError = false;
+    }
+
+    if (_signname == "") {
+      isValid = false;
+      _signnameShowError = true;
+      _signnameError = 'Ingrese un Nombre del Firmante';
+    } else {
+      _signnameShowError = false;
     }
 
     setState(() {});
@@ -1567,6 +1584,9 @@ class _InstalacionNuevaScreenState extends State<InstalacionNuevaScreen> {
       'TipoInstalacion': _tipoinstalacion,
       'EsAveria': _esAveria ? 'SI' : 'NO',
       'Auditado': 0,
+      'DocumentoFirmante': _signdocument,
+      'MismoFirmante': _coincideFirmante ? 1 : 0,
+      'TipoPedido': _tipoPedido == 0 ? 'OMS' : 'SOM',
     };
 
     if (!widget.editMode) {
@@ -1799,6 +1819,12 @@ class _InstalacionNuevaScreenState extends State<InstalacionNuevaScreen> {
 
     _signname = widget.instalacion.nombreApellidoFirmante;
     _signnameController.text = widget.instalacion.nombreApellidoFirmante;
+
+    _signdocument = widget.instalacion.documentoFirmante;
+    _signdocumentController.text = widget.instalacion.documentoFirmante;
+
+    _tipoPedido = widget.instalacion.tipoPedido == 'OMS' ? 0 : 1;
+    _coincideFirmante = widget.instalacion!.mismoFirmante == 0 ? false : true;
 
     setState(() {});
   }
