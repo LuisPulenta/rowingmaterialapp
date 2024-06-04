@@ -37,12 +37,6 @@ class _HomeScreenState extends State<HomeScreen> {
 
   @override
   Widget build(BuildContext context) {
-    const _nTextstyle = TextStyle(
-      fontSize: 32.0,
-      fontWeight: FontWeight.bold,
-      color: Colors.blueAccent,
-    );
-
     return Scaffold(
       // appBar: AppBar(
       //   title: const Text('Rowing Material App'),
@@ -57,7 +51,7 @@ class _HomeScreenState extends State<HomeScreen> {
 //---------------------------------------------------------------
 
   Widget _getBody() {
-    const _nTextstyle = TextStyle(
+    const nTextstyle = TextStyle(
       fontSize: 24.0,
       fontWeight: FontWeight.bold,
       color: Colors.white,
@@ -104,7 +98,7 @@ class _HomeScreenState extends State<HomeScreen> {
                   for (final text in ['Bienvenido/a'])
                     WavyAnimatedText(
                       text,
-                      textStyle: _nTextstyle,
+                      textStyle: nTextstyle,
                       textAlign: TextAlign.center,
                     )
                 ],
@@ -119,7 +113,7 @@ class _HomeScreenState extends State<HomeScreen> {
                   for (final text in [widget.user.nombre!.replaceAll("  ", "")])
                     WavyAnimatedText(
                       text,
-                      textStyle: _nTextstyle,
+                      textStyle: nTextstyle,
                       textAlign: TextAlign.center,
                     )
                 ],
