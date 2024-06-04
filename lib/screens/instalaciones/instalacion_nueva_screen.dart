@@ -1616,7 +1616,7 @@ class _InstalacionNuevaScreenState extends State<InstalacionNuevaScreen> {
             'CODSAP': serie.codigosap,
             'NombreEquipo': serie.denominacion,
             'NROREGISTROLOTESCAB': serie.nroregistro,
-            'LinkFoto': serie.foto,
+            'LinkFoto': serie.foto ?? "",
           };
           await ApiHelper.post(
               '/api/AppInstalacionesEquipo/PostAppInstalacionesEquiposDetalle',

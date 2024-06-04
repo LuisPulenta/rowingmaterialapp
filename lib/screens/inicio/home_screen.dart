@@ -4,6 +4,7 @@ import 'package:rowingmaterialapp/screens/screens.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:rowingmaterialapp/widgets/widgets.dart';
+import 'package:animated_text_kit/animated_text_kit.dart';
 
 class HomeScreen extends StatefulWidget {
   final User user;
@@ -21,7 +22,7 @@ class _HomeScreenState extends State<HomeScreen> {
 //----------------------- Variables -----------------------------
 //---------------------------------------------------------------
 
-  //---------------------------------------------------------------
+//---------------------------------------------------------------
 //----------------------- initState -----------------------------
 //---------------------------------------------------------------
 
@@ -36,6 +37,12 @@ class _HomeScreenState extends State<HomeScreen> {
 
   @override
   Widget build(BuildContext context) {
+    const _nTextstyle = TextStyle(
+      fontSize: 32.0,
+      fontWeight: FontWeight.bold,
+      color: Colors.blueAccent,
+    );
+
     return Scaffold(
       // appBar: AppBar(
       //   title: const Text('Rowing Material App'),
@@ -50,6 +57,12 @@ class _HomeScreenState extends State<HomeScreen> {
 //---------------------------------------------------------------
 
   Widget _getBody() {
+    const _nTextstyle = TextStyle(
+      fontSize: 24.0,
+      fontWeight: FontWeight.bold,
+      color: Colors.white,
+    );
+
     double ancho = MediaQuery.of(context).size.width;
     return Container(
         width: double.infinity,
@@ -66,7 +79,7 @@ class _HomeScreenState extends State<HomeScreen> {
         ),
         child: Column(
           children: [
-            SizedBox(
+            const SizedBox(
               height: 60,
             ),
             Image.asset(
@@ -84,25 +97,34 @@ class _HomeScreenState extends State<HomeScreen> {
             const SizedBox(
               height: 10,
             ),
-            const Text(
-              'Bienvenido/a',
-              style: TextStyle(
-                  fontSize: 20,
-                  fontWeight: FontWeight.bold,
-                  color: Colors.white),
+            SizedBox(
+              height: 80,
+              child: AnimatedTextKit(
+                animatedTexts: [
+                  for (final text in ['Bienvenido/a'])
+                    WavyAnimatedText(
+                      text,
+                      textStyle: _nTextstyle,
+                      textAlign: TextAlign.center,
+                    )
+                ],
+                repeatForever: true,
+              ),
             ),
-            const SizedBox(
-              height: 5,
-            ),
-            Text(
-              widget.user.nombre!.replaceAll("  ", ""),
-              style: const TextStyle(
-                  fontSize: 20,
-                  fontWeight: FontWeight.bold,
-                  color: Colors.white),
-            ),
-            const SizedBox(
-              height: 15,
+            SizedBox(
+              height: 80,
+              width: double.infinity,
+              child: AnimatedTextKit(
+                animatedTexts: [
+                  for (final text in [widget.user.nombre!.replaceAll("  ", "")])
+                    WavyAnimatedText(
+                      text,
+                      textStyle: _nTextstyle,
+                      textAlign: TextAlign.center,
+                    )
+                ],
+                repeatForever: true,
+              ),
             ),
             Row(
               children: [
