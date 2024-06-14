@@ -8,6 +8,7 @@ class AppInstalacionesEquiposDetalle {
   String? nombreEquipo = '';
   String? linkFoto = '';
   int? nroregistrolotescab = 0;
+  String? familia = '';
   String? imageFullPath = '';
 
   AppInstalacionesEquiposDetalle(
@@ -20,6 +21,7 @@ class AppInstalacionesEquiposDetalle {
       required this.nombreEquipo,
       required this.linkFoto,
       required this.nroregistrolotescab,
+      required this.familia,
       required this.imageFullPath});
 
   AppInstalacionesEquiposDetalle.fromJson(Map<String, dynamic> json) {
@@ -32,6 +34,7 @@ class AppInstalacionesEquiposDetalle {
     nombreEquipo = json['nombreEquipo'];
     linkFoto = json['linkFoto'];
     nroregistrolotescab = json['nroregistrolotescab'];
+    familia = json['familia'];
     imageFullPath = json['imageFullPath'];
   }
 
@@ -46,6 +49,7 @@ class AppInstalacionesEquiposDetalle {
     data['nombreEquipo'] = nombreEquipo;
     data['linkFoto'] = linkFoto;
     data['nroregistrolotescab'] = nroregistrolotescab;
+    data['familia'] = familia;
     data['imageFullPath'] = imageFullPath;
     return data;
   }

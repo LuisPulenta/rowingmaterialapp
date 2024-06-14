@@ -60,7 +60,8 @@ class _InstalacionNuevaScreenState extends State<InstalacionNuevaScreen> {
       codigosiag: '',
       codigosap: '',
       denominacion: '',
-      foto: '');
+      foto: '',
+      familia: '');
 
   AppInstalacionesEquipo appInstalacionesEquipo = AppInstalacionesEquipo(
       idRegistro: 0,
@@ -98,7 +99,8 @@ class _InstalacionNuevaScreenState extends State<InstalacionNuevaScreen> {
       codigosiag: '',
       codigosap: '',
       denominacion: '',
-      foto: '');
+      foto: '',
+      familia: '');
 
   String _serie = '';
 
@@ -141,7 +143,12 @@ class _InstalacionNuevaScreenState extends State<InstalacionNuevaScreen> {
   String _tipoinstalacionError = '';
   bool _tipoinstalacionShowError = false;
 
+  String _tipoequipo = 'Elija un tipo de equipo...';
+  String _tipoequipoError = '';
+  bool _tipoequipoShowError = false;
+
   List<TipoInstalacion> _tiposinstalacion = [];
+  List<TipoInstalacion> _tiposequipo = [];
 
   String _pedido = '';
   String _pedidoError = '';
@@ -334,58 +341,63 @@ class _InstalacionNuevaScreenState extends State<InstalacionNuevaScreen> {
           child: Container(
             height: 50,
             margin: const EdgeInsets.all(0),
-            padding: const EdgeInsets.all(5),
-            child: Row(
+            padding: const EdgeInsets.symmetric(horizontal: 5),
+            child: Column(
               children: [
-                Text(
-                  e.nroseriesalida,
-                  style: const TextStyle(fontWeight: FontWeight.bold),
-                ),
-                const SizedBox(
-                  width: 5,
-                ),
-                e.denominacion!.length > 20
-                    ? Text(
-                        e.denominacion!.substring(0, 20),
-                      )
-                    : Text(
-                        e.denominacion!,
+                Row(
+                  children: [
+                    Text(
+                      e.nroseriesalida,
+                      style: const TextStyle(fontWeight: FontWeight.bold),
+                    ),
+                    const SizedBox(
+                      width: 5,
+                    ),
+                    "${e.denominacion}-${e.familia}".length > 22
+                        ? Text(
+                            "${e.denominacion}-${e.familia}".substring(0, 22),
+                          )
+                        : Text(
+                            "${e.denominacion}-${e.familia}",
+                          ),
+                    const Spacer(),
+                    e.foto == null
+                        ? IconButton(
+                            onPressed: () async {
+                              e.foto = await _takePicture();
+                              setState(() {});
+                            },
+                            icon: const Icon(
+                              Icons.add_a_photo,
+                              color: Color(0xFF781f1e),
+                            ),
+                          )
+                        : IconButton(
+                            onPressed: () async {
+                              Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                      builder: (context) =>
+                                          InstalacionVerFotoScreen(
+                                              foto: e.foto!)));
+                            },
+                            icon: const Icon(
+                              Icons.photo_camera,
+                              color: Color.fromARGB(255, 58, 204, 39),
+                            ),
+                          ),
+                    IconButton(
+                      onPressed: () {
+                        _series.remove(e);
+                        setState(() {});
+                      },
+                      icon: const Icon(
+                        Icons.delete,
+                        color: Colors.red,
                       ),
-                const Spacer(),
-                e.foto == null
-                    ? IconButton(
-                        onPressed: () async {
-                          e.foto = await _takePicture();
-                          setState(() {});
-                        },
-                        icon: const Icon(
-                          Icons.add_a_photo,
-                          color: Color(0xFF781f1e),
-                        ),
-                      )
-                    : IconButton(
-                        onPressed: () async {
-                          Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                  builder: (context) =>
-                                      InstalacionVerFotoScreen(foto: e.foto!)));
-                        },
-                        icon: const Icon(
-                          Icons.photo_camera,
-                          color: Color.fromARGB(255, 58, 204, 39),
-                        ),
-                      ),
-                IconButton(
-                  onPressed: () {
-                    _series.remove(e);
-                    setState(() {});
-                  },
-                  icon: const Icon(
-                    Icons.delete,
-                    color: Colors.red,
-                  ),
-                )
+                    )
+                  ],
+                ),
               ],
             ),
           ),
@@ -865,57 +877,67 @@ class _InstalacionNuevaScreenState extends State<InstalacionNuevaScreen> {
                               title: const Text("Ingrese o escanee el código"),
                               content: Column(
                                 children: [
-                                  TextField(
-                                    autofocus: true,
-                                    controller: _serieController,
-                                    decoration: InputDecoration(
-                                        fillColor: Colors.white,
-                                        filled: true,
-                                        hintText: '',
-                                        labelText: '',
-                                        errorText: _serieShowError
-                                            ? _serieError
-                                            : null,
-                                        prefixIcon: const Icon(Icons.tag),
-                                        border: OutlineInputBorder(
-                                            borderRadius:
-                                                BorderRadius.circular(10))),
-                                    onChanged: (value) {
-                                      _serie = value;
-                                    },
-                                  ),
-                                  const SizedBox(height: 10),
-                                  ElevatedButton(
-                                      style: ElevatedButton.styleFrom(
-                                        backgroundColor:
-                                            const Color(0xFF282886),
-                                        minimumSize: const Size(50, 50),
-                                        shape: RoundedRectangleBorder(
-                                          borderRadius:
-                                              BorderRadius.circular(5),
+                                  Row(
+                                    children: [
+                                      Expanded(
+                                        child: TextField(
+                                          autofocus: true,
+                                          controller: _serieController,
+                                          decoration: InputDecoration(
+                                              fillColor: Colors.white,
+                                              filled: true,
+                                              hintText: '',
+                                              labelText: '',
+                                              errorText: _serieShowError
+                                                  ? _serieError
+                                                  : null,
+                                              prefixIcon: const Icon(Icons.tag),
+                                              border: OutlineInputBorder(
+                                                  borderRadius:
+                                                      BorderRadius.circular(
+                                                          10))),
+                                          onChanged: (value) {
+                                            _serie = value;
+                                          },
                                         ),
                                       ),
-                                      onPressed: () async {
-                                        String barcodeScanRes;
-                                        try {
-                                          barcodeScanRes =
-                                              await FlutterBarcodeScanner
-                                                  .scanBarcode(
-                                                      '#3D8BEF',
-                                                      'Cancelar',
-                                                      false,
-                                                      ScanMode.DEFAULT);
-                                          //print(barcodeScanRes);
-                                        } on PlatformException {
-                                          barcodeScanRes = 'Error';
-                                        }
-                                        // if (!mounted) return;
-                                        if (barcodeScanRes == '-1') {
-                                          return;
-                                        }
-                                        _serieController.text = barcodeScanRes;
-                                      },
-                                      child: const Icon(Icons.qr_code_2)),
+                                      const SizedBox(
+                                        width: 5,
+                                      ),
+                                      ElevatedButton(
+                                          style: ElevatedButton.styleFrom(
+                                            backgroundColor:
+                                                const Color(0xFF282886),
+                                            minimumSize: const Size(50, 50),
+                                            shape: RoundedRectangleBorder(
+                                              borderRadius:
+                                                  BorderRadius.circular(5),
+                                            ),
+                                          ),
+                                          onPressed: () async {
+                                            String barcodeScanRes;
+                                            try {
+                                              barcodeScanRes =
+                                                  await FlutterBarcodeScanner
+                                                      .scanBarcode(
+                                                          '#3D8BEF',
+                                                          'Cancelar',
+                                                          false,
+                                                          ScanMode.DEFAULT);
+                                            } on PlatformException {
+                                              barcodeScanRes = 'Error';
+                                            }
+                                            if (barcodeScanRes == '-1') {
+                                              return;
+                                            }
+                                            _serieController.text =
+                                                barcodeScanRes;
+                                          },
+                                          child: const Icon(Icons.qr_code_2)),
+                                    ],
+                                  ),
+                                  const SizedBox(height: 10),
+                                  _showTiposEquipo(),
                                 ],
                               ),
                               actions: [
@@ -1010,6 +1032,18 @@ class _InstalacionNuevaScreenState extends State<InstalacionNuevaScreen> {
                                                 await _validarSerie(_serie);
 
                                             if (!isValidSerie) {
+                                              if (_tipoequipo ==
+                                                  'Elija un tipo de equipo...') {
+                                                _tipoequipoShowError = true;
+                                                _tipoequipoError =
+                                                    'Debe elegir un tipo de equipo';
+                                                return;
+                                              } else {
+                                                _tipoequipoShowError = false;
+                                              }
+                                            }
+
+                                            if (!isValidSerie) {
                                               await showDialog(
                                                   barrierDismissible: false,
                                                   context: context,
@@ -1060,8 +1094,15 @@ class _InstalacionNuevaScreenState extends State<InstalacionNuevaScreen> {
 
                                             if (_serie.isNotEmpty) {
                                               _serieConDatos.foto = null;
+                                              _serieConDatos
+                                                  .familia = _tipoequipo ==
+                                                      'Elija un tipo de equipo...'
+                                                  ? null
+                                                  : _tipoequipo;
                                               _series.add(_serieConDatos);
                                               _serie = '';
+                                              _tipoequipo =
+                                                  'Elija un tipo de equipo...';
                                               setState(() {});
                                             }
 
@@ -1617,6 +1658,7 @@ class _InstalacionNuevaScreenState extends State<InstalacionNuevaScreen> {
             'NombreEquipo': serie.denominacion,
             'NROREGISTROLOTESCAB': serie.nroregistro,
             'LinkFoto': serie.foto ?? "",
+            'Familia': serie.familia,
           };
           await ApiHelper.post(
               '/api/AppInstalacionesEquipo/PostAppInstalacionesEquiposDetalle',
@@ -1656,6 +1698,15 @@ class _InstalacionNuevaScreenState extends State<InstalacionNuevaScreen> {
   }
 
 //-----------------------------------------------------------------
+//--------------------- _loadData ---------------------------------
+//-----------------------------------------------------------------
+
+  void _loadData() async {
+    await _getTiposInstalacion();
+    await _getTiposEquipo();
+  }
+
+//-----------------------------------------------------------------
 //--------------------- _showTiposInstalacion ---------------------
 //-----------------------------------------------------------------
 
@@ -1687,14 +1738,6 @@ class _InstalacionNuevaScreenState extends State<InstalacionNuevaScreen> {
   }
 
 //-----------------------------------------------------------------
-//--------------------- _loadData ---------------------------------
-//-----------------------------------------------------------------
-
-  void _loadData() async {
-    await _getTiposInstalacion();
-  }
-
-//-----------------------------------------------------------------
 //--------------------- _getTiposInstalacion ----------------------
 //-----------------------------------------------------------------
 
@@ -1705,12 +1748,6 @@ class _InstalacionNuevaScreenState extends State<InstalacionNuevaScreen> {
       TipoInstalacion(tipoinstalacion: 'IPTV'),
       TipoInstalacion(tipoinstalacion: 'Otro'),
     ];
-
-    if (widget.editMode) {
-      await _loadFields();
-    } else {
-      setState(() {});
-    }
   }
 
 //-----------------------------------------------------------------
@@ -1740,6 +1777,97 @@ class _InstalacionNuevaScreenState extends State<InstalacionNuevaScreen> {
       child: Text('Otro'),
     ));
 
+    return list;
+  }
+
+//-----------------------------------------------------------------
+//--------------------- _showTiposEquipo --------------------------
+//-----------------------------------------------------------------
+
+  Widget _showTiposEquipo() {
+    return Container(
+      padding: const EdgeInsets.all(0),
+      child: _tipoequipo.isEmpty
+          ? const Text('Cargando tipos de equipo...')
+          : DropdownButtonFormField(
+              value: _tipoequipo,
+              decoration: InputDecoration(
+                fillColor: false ? Colors.yellow[200] : Colors.white,
+                filled: true,
+                hintText: 'Elija un tipo de equipo...',
+                labelText: 'Tipo de equipo',
+                errorText: _tipoequipoShowError ? _tipoequipoError : null,
+                border:
+                    OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
+              ),
+              items: _getComboEquipos(),
+              onChanged: (value) {
+                _tipoequipo = value.toString();
+              },
+            ),
+    );
+  }
+
+//-----------------------------------------------------------------
+//--------------------- _getTiposEquipo ---------------------------
+//-----------------------------------------------------------------
+
+  Future<void> _getTiposEquipo() async {
+    _tiposequipo = [
+      TipoInstalacion(tipoinstalacion: 'Elija un tipo de equipo...'),
+      TipoInstalacion(tipoinstalacion: 'HGU'),
+      TipoInstalacion(tipoinstalacion: 'HGU PLUS'),
+      TipoInstalacion(tipoinstalacion: 'IPTV WIFI'),
+      TipoInstalacion(tipoinstalacion: 'IPTV ETHERNET'),
+      TipoInstalacion(tipoinstalacion: 'REPETIDOR'),
+      TipoInstalacion(tipoinstalacion: 'NO LO SE'),
+    ];
+
+    if (widget.editMode) {
+      await _loadFields();
+    } else {
+      setState(() {});
+    }
+  }
+
+//-----------------------------------------------------------------
+//--------------------- _getComboEquipos --------------------------
+//-----------------------------------------------------------------
+
+  List<DropdownMenuItem<String>> _getComboEquipos() {
+    List<DropdownMenuItem<String>> list = [];
+
+    list.add(const DropdownMenuItem(
+      value: 'Elija un tipo de equipo...',
+      child: Text('Elija un tipo de equipo...'),
+    ));
+
+    list.add(const DropdownMenuItem(
+      value: 'HGU',
+      child: Text('HGU'),
+    ));
+
+    list.add(const DropdownMenuItem(
+      value: 'HGU PLUS',
+      child: Text('HGU PLUS'),
+    ));
+
+    list.add(const DropdownMenuItem(
+      value: 'IPTV WIFI',
+      child: Text('IPTV WIFI'),
+    ));
+    list.add(const DropdownMenuItem(
+      value: 'IPTV ETHERNET',
+      child: Text('IPTV ETHERNET'),
+    ));
+    list.add(const DropdownMenuItem(
+      value: 'REPETIDOR',
+      child: Text('REPETIDOR'),
+    ));
+    list.add(const DropdownMenuItem(
+      value: 'NO LO SE',
+      child: Text('NO LO SE'),
+    ));
     return list;
   }
 
@@ -1882,8 +2010,9 @@ class _InstalacionNuevaScreenState extends State<InstalacionNuevaScreen> {
           nroseriesalida: _serie,
           codigosiag: '',
           codigosap: '',
-          denominacion: "Equipo No Registrado",
-          foto: '');
+          denominacion: "Eq.No Reg.",
+          foto: '',
+          familia: '');
       _showLoader = false;
       return false;
     }

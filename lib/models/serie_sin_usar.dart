@@ -8,6 +8,7 @@ class SerieSinUsar {
   String codigosap = '';
   String? denominacion = '';
   String? foto = '';
+  String? familia = '';
 
   SerieSinUsar(
       {required this.nroregistro,
@@ -18,7 +19,8 @@ class SerieSinUsar {
       required this.codigosiag,
       required this.codigosap,
       required this.denominacion,
-      required this.foto});
+      required this.foto,
+      required this.familia});
 
   SerieSinUsar.fromJson(Map<String, dynamic> json) {
     nroregistro = json['nroregistro'];
@@ -30,6 +32,7 @@ class SerieSinUsar {
     codigosap = json['codigosap'];
     denominacion = json['denominacion'];
     foto = json['foto'];
+    familia = json['familia'];
   }
 
   Map<String, dynamic> toJson() {
@@ -43,6 +46,7 @@ class SerieSinUsar {
     data['codigosap'] = codigosap;
     data['denominacion'] = denominacion;
     data['foto'] = foto;
+    data['familia'] = familia;
     return data;
   }
 }
