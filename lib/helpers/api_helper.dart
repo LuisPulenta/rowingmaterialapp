@@ -162,4 +162,31 @@ class ApiHelper {
     }
     return Response(isSuccess: true, result: list);
   }
+
+  //---------------------------------------------------------------------------
+  static Future<Response> getProductos() async {
+    var url = Uri.parse(
+        '${Constants.apiUrl}/api/AppInstalacionesEquipo/GetProductos');
+    var response = await http.post(
+      url,
+      headers: {
+        'content-type': 'application/json',
+        'accept': 'application/json',
+      },
+    );
+    var body = response.body;
+
+    if (response.statusCode >= 400) {
+      return Response(isSuccess: false, message: body);
+    }
+
+    List<Producto> list = [];
+    var decodedJson = jsonDecode(body);
+    if (decodedJson != null) {
+      for (var item in decodedJson) {
+        list.add(Producto.fromJson(item));
+      }
+    }
+    return Response(isSuccess: true, result: list);
+  }
 }

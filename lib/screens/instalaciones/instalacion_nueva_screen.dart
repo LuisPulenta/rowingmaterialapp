@@ -2,6 +2,7 @@ import 'dart:convert';
 
 import 'package:adaptive_dialog/adaptive_dialog.dart';
 import 'package:connectivity/connectivity.dart';
+import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_barcode_scanner/flutter_barcode_scanner.dart';
@@ -32,10 +33,20 @@ class InstalacionNuevaScreen extends StatefulWidget {
   State<InstalacionNuevaScreen> createState() => _InstalacionNuevaScreenState();
 }
 
-class _InstalacionNuevaScreenState extends State<InstalacionNuevaScreen> {
+class _InstalacionNuevaScreenState extends State<InstalacionNuevaScreen>
+    with SingleTickerProviderStateMixin {
 //---------------------------------------------------------------
 //----------------------- Variables -----------------------------
 //---------------------------------------------------------------
+
+  TabController? _tabController;
+
+  final String _cantidadError = '';
+  final bool _cantidadShowError = false;
+  final TextEditingController _cantidadController = TextEditingController();
+
+  String _cantidad = '';
+
   bool _showLoader = false;
   final String _textComponent = 'Por favor espere...';
   bool _signatureChanged = false;
@@ -51,6 +62,8 @@ class _InstalacionNuevaScreenState extends State<InstalacionNuevaScreen> {
   bool existeSerie = false;
   List<SerieSinUsar> _serieSinUsar = [];
   List<SerieSinUsar> _series = [];
+  List<Producto> _productos = [];
+  List<Producto> _materiales = [];
   SerieSinUsar _serieConDatos = SerieSinUsar(
       nroregistro: 0,
       nrolotecab: 0,
@@ -187,6 +200,7 @@ class _InstalacionNuevaScreenState extends State<InstalacionNuevaScreen> {
   @override
   void initState() {
     super.initState();
+    _tabController = TabController(length: 2, vsync: this);
     _signature = null;
     _loadData();
   }
@@ -198,131 +212,478 @@ class _InstalacionNuevaScreenState extends State<InstalacionNuevaScreen> {
   Widget build(BuildContext context) {
     double ancho = MediaQuery.of(context).size.width;
     return Scaffold(
+      backgroundColor: Color.fromARGB(255, 227, 225, 225),
       appBar: AppBar(
         title: (widget.editMode)
             ? const Text('Editar Instalación')
             : const Text('Nueva Instalación'),
         centerTitle: true,
       ),
-      body: SingleChildScrollView(
-        physics: const BouncingScrollPhysics(),
-        child: Column(
-          children: <Widget>[
-            const SizedBox(
-              height: 15,
-            ),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceAround,
-              children: const [
-                Titulo(
-                  texto: "DATOS CLIENTE",
-                  color: Color.fromARGB(255, 10, 226, 250),
-                ),
-              ],
-            ),
-            const SizedBox(
-              height: 5,
-            ),
-            _showDocument(),
-            _showFirstName(),
-            _showLastName(),
-            _showAddress(),
-            _showLatLong(),
-            _showEntrecalles(),
-            const Divider(
-              color: Colors.black,
-            ),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceAround,
-              children: const [
-                Titulo(
-                  texto: "DATOS INSTALACION",
-                  color: Color.fromARGB(255, 10, 226, 250),
-                ),
-              ],
-            ),
-            _showTiposInstalacion(),
-            _showFechaInstalacion(),
-            _showTipoPedido(),
-            _showPedido(),
-            _showAveria(),
-            const Divider(
-              color: Colors.black,
-            ),
-            !widget.editMode
-                ? Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceAround,
-                    children: const [
-                      Titulo(
-                        texto: "EQUIPOS INSTALADOS",
-                        color: Color.fromARGB(255, 10, 226, 250),
-                      ),
-                    ],
-                  )
-                : Container(),
-            ((!widget.editMode) && (_series.isNotEmpty))
-                ? Padding(
-                    padding: const EdgeInsets.symmetric(vertical: 5.0),
-                    child: Text(
-                        "Cant. de Equipos instalados: ${_series.length}",
-                        style: const TextStyle(
-                            fontSize: 16, fontWeight: FontWeight.bold)),
-                  )
-                : Container(),
-            ((!widget.editMode) && (_series.isEmpty))
-                ? const Padding(
-                    padding: EdgeInsets.symmetric(vertical: 5),
-                    child: Text(
-                      'No hay Equipos registrados',
-                      style: TextStyle(
-                          color: Colors.red,
-                          fontSize: 16,
-                          fontWeight: FontWeight.bold),
+      bottomNavigationBar: BottomAppBar(
+        color: Color(0xFF781f1e),
+        child: TabBar(
+            controller: _tabController,
+            indicatorColor: Colors.yellow,
+            indicatorSize: TabBarIndicatorSize.tab,
+            indicatorWeight: 10,
+            labelColor: Colors.white,
+            unselectedLabelColor: Colors.grey,
+            labelPadding: const EdgeInsets.all(10),
+            tabs: <Widget>[
+              Tab(
+                child: Column(
+                  children: const [
+                    Icon(Icons.cable),
+                    SizedBox(
+                      width: 5,
                     ),
-                  )
-                : SizedBox(height: _series.length * 54, child: _showSeries()),
-            !widget.editMode ? _showSerie() : Container(),
-            const Divider(
-              color: Colors.black,
-            ),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceAround,
-              children: const [
-                Titulo(
-                  texto: "CONFORMIDAD CLIENTE",
-                  color: Color.fromARGB(255, 10, 226, 250),
+                    Text(
+                      "Instalación",
+                      style: TextStyle(fontSize: 14),
+                    ),
+                  ],
+                ),
+              ),
+              Tab(
+                child: Column(
+                  children: const [
+                    Icon(Icons.category),
+                    SizedBox(
+                      width: 5,
+                    ),
+                    Text(
+                      "Materiales",
+                      style: TextStyle(fontSize: 14),
+                    ),
+                  ],
+                ),
+              ),
+            ]),
+      ),
+      body: TabBarView(
+        controller: _tabController,
+        physics: const AlwaysScrollableScrollPhysics(),
+        dragStartBehavior: DragStartBehavior.start,
+        children: <Widget>[
+//-------------------------------------------------------------------------
+//-------------------------- 1° TABBAR ------------------------------------
+//-------------------------------------------------------------------------
+
+          SingleChildScrollView(
+            physics: const BouncingScrollPhysics(),
+            child: Column(
+              children: <Widget>[
+                const SizedBox(
+                  height: 15,
+                ),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceAround,
+                  children: const [
+                    Titulo(
+                      texto: "DATOS CLIENTE",
+                      color: Color.fromARGB(255, 10, 226, 250),
+                    ),
+                  ],
+                ),
+                const SizedBox(
+                  height: 5,
+                ),
+                _showDocument(),
+                _showFirstName(),
+                _showLastName(),
+                _showAddress(),
+                _showLatLong(),
+                _showEntrecalles(),
+                const Divider(
+                  color: Colors.black,
+                ),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceAround,
+                  children: const [
+                    Titulo(
+                      texto: "DATOS INSTALACION",
+                      color: Color.fromARGB(255, 10, 226, 250),
+                    ),
+                  ],
+                ),
+                _showTiposInstalacion(),
+                _showFechaInstalacion(),
+                _showTipoPedido(),
+                _showPedido(),
+                _showAveria(),
+                const Divider(
+                  color: Colors.black,
+                ),
+                !widget.editMode
+                    ? Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceAround,
+                        children: const [
+                          Titulo(
+                            texto: "EQUIPOS INSTALADOS",
+                            color: Color.fromARGB(255, 10, 226, 250),
+                          ),
+                        ],
+                      )
+                    : Container(),
+                ((!widget.editMode) && (_series.isNotEmpty))
+                    ? Padding(
+                        padding: const EdgeInsets.symmetric(vertical: 5.0),
+                        child: Text(
+                            "Cant. de Equipos instalados: ${_series.length}",
+                            style: const TextStyle(
+                                fontSize: 16, fontWeight: FontWeight.bold)),
+                      )
+                    : Container(),
+                ((!widget.editMode) && (_series.isEmpty))
+                    ? const Padding(
+                        padding: EdgeInsets.symmetric(vertical: 5),
+                        child: Text(
+                          'No hay Equipos registrados',
+                          style: TextStyle(
+                              color: Colors.red,
+                              fontSize: 16,
+                              fontWeight: FontWeight.bold),
+                        ),
+                      )
+                    : SizedBox(
+                        height: _series.length * 54, child: _showSeries()),
+                !widget.editMode ? _showSerie() : Container(),
+                const Divider(
+                  color: Colors.black,
+                ),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceAround,
+                  children: const [
+                    Titulo(
+                      texto: "MATERIALES DESCARGADOS",
+                      color: Color.fromARGB(255, 10, 226, 250),
+                    ),
+                  ],
+                ),
+                (_productos.isEmpty)
+                    ? const Padding(
+                        padding: EdgeInsets.symmetric(vertical: 5),
+                        child: Text(
+                          'No hay Materiales descargados',
+                          style: TextStyle(
+                              color: Colors.red,
+                              fontSize: 16,
+                              fontWeight: FontWeight.bold),
+                        ),
+                      )
+                    : SizedBox(
+                        height: _productos.length * 24,
+                        child: _showProductos()),
+                const Divider(
+                  color: Colors.black,
+                ),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceAround,
+                  children: const [
+                    Titulo(
+                      texto: "CONFORMIDAD CLIENTE",
+                      color: Color.fromARGB(255, 10, 226, 250),
+                    ),
+                  ],
+                ),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceAround,
+                  children: const [
+                    Text("Firma Cliente",
+                        style: TextStyle(
+                            color: Colors.black,
+                            fontSize: 16,
+                            fontWeight: FontWeight.bold)),
+                  ],
+                ),
+                _showButtonsFirma(ancho),
+                _showCoinncideFirmante(),
+                _showSignDocument(),
+                _showSignName(),
+                const Divider(
+                  color: Colors.black,
+                ),
+                _showButton(),
+                const SizedBox(
+                  height: 25,
+                ),
+                Center(
+                  child: _showLoader
+                      ? LoaderComponent(text: _textComponent)
+                      : Container(),
                 ),
               ],
             ),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceAround,
-              children: const [
-                Text("Firma Cliente",
-                    style: TextStyle(
-                        color: Colors.black,
-                        fontSize: 16,
-                        fontWeight: FontWeight.bold)),
+          ),
+
+//-------------------------------------------------------------------------
+//-------------------------- 2° TABBAR ------------------------------------
+//-------------------------------------------------------------------------
+
+          Center(
+            child: Stack(
+              children: [
+                _getContent(),
+                _showLoader
+                    ? const LoaderComponent(
+                        text: 'Grabando...',
+                      )
+                    : Container(),
               ],
             ),
-            _showButtonsFirma(ancho),
-            _showCoinncideFirmante(),
-            _showSignDocument(),
-            _showSignName(),
-            const Divider(
-              color: Colors.black,
+          ),
+
+//-------------------------------------------------------------------------
+//-------------------------- FINAL del TABBAR -----------------------------
+//-------------------------------------------------------------------------
+        ],
+      ),
+    );
+  }
+
+//-----------------------------------------------------------------
+//--------------------- _getContent -------------------------------
+//-----------------------------------------------------------------
+
+  Widget _getContent() {
+    return Column(
+      children: <Widget>[
+        const SizedBox(
+          height: 10,
+        ),
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceAround,
+          children: const [
+            Text(
+              "Material         ",
+              style: TextStyle(color: Colors.black),
             ),
-            _showButton(),
-            const SizedBox(
-              height: 25,
+            Text(
+              "   ",
+              style: TextStyle(color: Colors.black),
             ),
-            Center(
-              child: _showLoader
-                  ? LoaderComponent(text: _textComponent)
-                  : Container(),
+            Text(
+              "Cantidad                 ",
+              style: TextStyle(color: Colors.black),
             ),
           ],
         ),
-      ),
+        Expanded(
+          child: _getListView(),
+        ),
+        const SizedBox(
+          height: 10,
+        ),
+      ],
+    );
+  }
+
+  //-----------------------------------------------------------------
+//--------------------- _getListView ------------------------------
+//-----------------------------------------------------------------
+
+  Widget _getListView() {
+    return ListView(
+      children: _productos.map((e) {
+        return Card(
+          color: const Color(0xFFC7C7C8),
+          shadowColor: Colors.white,
+          elevation: 10,
+          margin: const EdgeInsets.fromLTRB(10, 0, 10, 10),
+          child: Container(
+            margin: const EdgeInsets.all(0),
+            padding: const EdgeInsets.symmetric(horizontal: 5),
+            child: Row(
+              children: [
+                Expanded(
+                  child: Container(
+                    margin: const EdgeInsets.symmetric(horizontal: 10),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.start,
+                      children: [
+                        Expanded(
+                          child: Column(
+                            children: [
+                              Row(
+                                children: [
+                                  Expanded(
+                                    flex: 4,
+                                    child: Text(
+                                        '${e.codigoSAP} - ${e.denominacion}',
+                                        style: const TextStyle(
+                                          fontSize: 12,
+                                        )),
+                                  ),
+                                  const SizedBox(
+                                    width: 5,
+                                  ),
+                                  Expanded(
+                                    flex: 1,
+                                    child: Text(e.cantidad.toString(),
+                                        style: const TextStyle(
+                                          fontSize: 14,
+                                          color: Colors.blue,
+                                          fontWeight: FontWeight.bold,
+                                        )),
+                                  ),
+                                  const SizedBox(
+                                    width: 10,
+                                  ),
+                                  IconButton(
+                                      onPressed: () {
+                                        _cantidadController.text =
+                                            e.cantidad == 0.0
+                                                ? ''
+                                                : e.cantidad.toString();
+                                        showDialog(
+                                            context: context,
+                                            builder: (BuildContext context) {
+                                              return AlertDialog(
+                                                backgroundColor:
+                                                    Colors.grey[300],
+                                                title: const Text(
+                                                    "Ingrese la cantidad"),
+                                                content: TextField(
+                                                  autofocus: true,
+                                                  controller:
+                                                      _cantidadController,
+                                                  decoration: InputDecoration(
+                                                      fillColor: Colors.white,
+                                                      filled: true,
+                                                      hintText: '',
+                                                      labelText: '',
+                                                      errorText:
+                                                          _cantidadShowError
+                                                              ? _cantidadError
+                                                              : null,
+                                                      prefixIcon:
+                                                          const Icon(Icons.tag),
+                                                      border:
+                                                          OutlineInputBorder(
+                                                              borderRadius:
+                                                                  BorderRadius
+                                                                      .circular(
+                                                                          10))),
+                                                  onChanged: (value) {
+                                                    _cantidad = value;
+                                                  },
+                                                ),
+                                                actions: [
+                                                  Row(
+                                                    children: [
+                                                      Expanded(
+                                                        child: ElevatedButton(
+                                                          child: Row(
+                                                            mainAxisAlignment:
+                                                                MainAxisAlignment
+                                                                    .spaceAround,
+                                                            children: const [
+                                                              Icon(
+                                                                  Icons.cancel),
+                                                              Text('Cancelar'),
+                                                            ],
+                                                          ),
+                                                          style: ElevatedButton
+                                                              .styleFrom(
+                                                            backgroundColor:
+                                                                const Color(
+                                                                    0xFFB4161B),
+                                                            minimumSize:
+                                                                const Size(
+                                                                    double
+                                                                        .infinity,
+                                                                    50),
+                                                            shape:
+                                                                RoundedRectangleBorder(
+                                                              borderRadius:
+                                                                  BorderRadius
+                                                                      .circular(
+                                                                          5),
+                                                            ),
+                                                          ),
+                                                          onPressed: () {
+                                                            Navigator.pop(
+                                                                context);
+                                                          },
+                                                        ),
+                                                      ),
+                                                      const SizedBox(
+                                                        width: 10,
+                                                      ),
+                                                      Expanded(
+                                                        child: ElevatedButton(
+                                                          child: Row(
+                                                            mainAxisAlignment:
+                                                                MainAxisAlignment
+                                                                    .spaceAround,
+                                                            children: const [
+                                                              Icon(Icons.save),
+                                                              Text('Aceptar'),
+                                                            ],
+                                                          ),
+                                                          style: ElevatedButton
+                                                              .styleFrom(
+                                                            backgroundColor:
+                                                                const Color(
+                                                                    0xFF120E43),
+                                                            minimumSize:
+                                                                const Size(
+                                                                    double
+                                                                        .infinity,
+                                                                    50),
+                                                            shape:
+                                                                RoundedRectangleBorder(
+                                                              borderRadius:
+                                                                  BorderRadius
+                                                                      .circular(
+                                                                          5),
+                                                            ),
+                                                          ),
+                                                          onPressed: () {
+                                                            for (Producto producto
+                                                                in _productos) {
+                                                              if (producto
+                                                                      .codigoSAP ==
+                                                                  e.codProducto) {
+                                                                producto.cantidad =
+                                                                    double.parse(
+                                                                        _cantidad);
+                                                              }
+                                                            }
+
+                                                            Navigator.pop(
+                                                                context);
+                                                            setState(() {});
+                                                          },
+                                                        ),
+                                                      ),
+                                                    ],
+                                                  ),
+                                                ],
+                                                shape: RoundedRectangleBorder(
+                                                    borderRadius:
+                                                        BorderRadius.circular(
+                                                            10)),
+                                              );
+                                            },
+                                            barrierDismissible: false);
+                                      },
+                                      icon: const Icon(Icons.loop,
+                                          color: Colors.blue)),
+                                ],
+                              ),
+                            ],
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        );
+      }).toList(),
     );
   }
 
@@ -407,6 +768,55 @@ class _InstalacionNuevaScreenState extends State<InstalacionNuevaScreen> {
   }
 
 //--------------------------------------------------------------
+//-------------------------- _showProductos --------------------
+//--------------------------------------------------------------
+
+  Widget _showProductos() {
+    return ListView(
+      children: _productos.map((e) {
+        return Card(
+          color: const Color.fromARGB(255, 142, 210, 237),
+          shadowColor: Colors.white,
+          elevation: 10,
+          margin: const EdgeInsets.fromLTRB(10, 2, 10, 2),
+          child: Container(
+            height: 22,
+            margin: const EdgeInsets.all(0),
+            padding: const EdgeInsets.symmetric(horizontal: 5),
+            child: Column(
+              children: [
+                Row(
+                  children: [
+                    Text(
+                      e.codigoSAP,
+                      style: const TextStyle(fontWeight: FontWeight.bold),
+                    ),
+                    const SizedBox(
+                      width: 5,
+                    ),
+                    e.denominacion.length > 22
+                        ? Text(
+                            e.denominacion.substring(0, 22),
+                          )
+                        : Text(
+                            e.denominacion,
+                          ),
+                    const Spacer(),
+                    Text(
+                      e.cantidad.toString(),
+                      style: const TextStyle(fontWeight: FontWeight.bold),
+                    ),
+                  ],
+                ),
+              ],
+            ),
+          ),
+        );
+      }).toList(),
+    );
+  }
+
+//--------------------------------------------------------------
 //-------------------------- _showDocument ---------------------
 //--------------------------------------------------------------
 
@@ -424,6 +834,7 @@ class _InstalacionNuevaScreenState extends State<InstalacionNuevaScreen> {
                       _document == "" ? Colors.yellow[200] : Colors.white,
                   filled: true,
                   enabled: true,
+                  isDense: true,
                   hintText: 'Ingresa documento...',
                   labelText: 'Documento',
                   errorText: _documentShowError ? _documentError : null,
@@ -530,6 +941,7 @@ class _InstalacionNuevaScreenState extends State<InstalacionNuevaScreen> {
         decoration: InputDecoration(
             fillColor: _firstname == "" ? Colors.yellow[200] : Colors.white,
             filled: true,
+            isDense: true,
             hintText: 'Ingrese nombre...',
             labelText: 'Nombre',
             errorText: _firstnameShowError ? _firstnameError : null,
@@ -555,6 +967,7 @@ class _InstalacionNuevaScreenState extends State<InstalacionNuevaScreen> {
         decoration: InputDecoration(
             fillColor: _firstname == "" ? Colors.yellow[200] : Colors.white,
             filled: true,
+            isDense: true,
             hintText: 'Ingrese apellido...',
             labelText: 'Apellido',
             errorText: _lastnameShowError ? _lastnameError : null,
@@ -583,6 +996,7 @@ class _InstalacionNuevaScreenState extends State<InstalacionNuevaScreen> {
               decoration: InputDecoration(
                   fillColor: _address == "" ? Colors.yellow[200] : Colors.white,
                   filled: true,
+                  isDense: true,
                   enabled: true,
                   hintText: 'Ingresa domicilio...',
                   labelText: 'Domicilio',
@@ -619,7 +1033,7 @@ class _InstalacionNuevaScreenState extends State<InstalacionNuevaScreen> {
 
   Widget _showLatLong() {
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 5),
+      padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 0),
       child: _latitud != ''
           ? Align(
               alignment: Alignment.centerLeft,
@@ -777,6 +1191,7 @@ class _InstalacionNuevaScreenState extends State<InstalacionNuevaScreen> {
         decoration: InputDecoration(
             fillColor: _pedido == "" ? Colors.yellow[200] : Colors.white,
             filled: true,
+            isDense: true,
             hintText: 'Ingrese pedido...',
             labelText: 'Pedido',
             errorText: _pedidoShowError ? _pedidoError : null,
@@ -802,6 +1217,7 @@ class _InstalacionNuevaScreenState extends State<InstalacionNuevaScreen> {
         decoration: InputDecoration(
             fillColor: _entrecalles == "" ? Colors.yellow[200] : Colors.white,
             filled: true,
+            isDense: true,
             hintText: 'Ingrese entre calles...',
             labelText: 'Entre calles',
             errorText: _entrecallesShowError ? _entrecallesError : null,
@@ -1307,6 +1723,7 @@ class _InstalacionNuevaScreenState extends State<InstalacionNuevaScreen> {
                       _signdocument == "" ? Colors.yellow[200] : Colors.white,
                   filled: true,
                   enabled: true,
+                  isDense: true,
                   hintText: 'Ingresa documento firmante...',
                   labelText: 'Documento firmante',
                   errorText: _signdocumentShowError ? _signdocumentError : null,
@@ -1404,6 +1821,7 @@ class _InstalacionNuevaScreenState extends State<InstalacionNuevaScreen> {
         decoration: InputDecoration(
             fillColor: _signname == "" ? Colors.yellow[200] : Colors.white,
             filled: true,
+            isDense: true,
             hintText: 'Ingrese Nombre y Apellido del Firmante...',
             labelText: 'Nombre y Apellido del Firmante',
             errorText: _signnameShowError ? _signnameError : null,
@@ -1703,6 +2121,7 @@ class _InstalacionNuevaScreenState extends State<InstalacionNuevaScreen> {
 
   void _loadData() async {
     await _getTiposInstalacion();
+    await _getProductos();
     await _getTiposEquipo();
   }
 
@@ -1722,6 +2141,7 @@ class _InstalacionNuevaScreenState extends State<InstalacionNuevaScreen> {
                     ? Colors.yellow[200]
                     : Colors.white,
                 filled: true,
+                isDense: true,
                 hintText: 'Elija un tipo de instalación...',
                 labelText: 'Tipo de instalación',
                 errorText:
@@ -2079,5 +2499,56 @@ class _InstalacionNuevaScreenState extends State<InstalacionNuevaScreen> {
     } else {
       return "";
     }
+  }
+
+//---------------------------------------------------------------------
+//------------------- _getProductos -----------------------------------
+//---------------------------------------------------------------------
+
+  Future<void> _getProductos() async {
+    setState(() {
+      _showLoader = true;
+    });
+
+    var connectivityResult = await Connectivity().checkConnectivity();
+
+    if (connectivityResult == ConnectivityResult.none) {
+      setState(() {
+        _showLoader = false;
+      });
+      await showAlertDialog(
+          context: context,
+          title: 'Error',
+          message: 'Verifica que estés conectado a Internet',
+          actions: <AlertDialogAction>[
+            const AlertDialogAction(key: null, label: 'Aceptar'),
+          ]);
+      return;
+    }
+
+    Response response = Response(isSuccess: false);
+
+    response = await ApiHelper.getProductos();
+
+    setState(() {
+      _showLoader = false;
+    });
+
+    if (!response.isSuccess) {
+      await showAlertDialog(
+          context: context,
+          title: 'Error',
+          message: response.message,
+          actions: <AlertDialogAction>[
+            const AlertDialogAction(key: null, label: 'Aceptar'),
+          ]);
+      return;
+    }
+
+    setState(() {
+      _productos = response.result;
+    });
+
+    var a = 1;
   }
 }
