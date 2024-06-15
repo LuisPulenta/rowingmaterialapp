@@ -2,7 +2,7 @@ class Producto {
   String codProducto = '';
   String codigoSAP = '';
   String denominacion = '';
-  double cantidad = 0;
+  double? cantidad = 0;
 
   Producto({
     required this.codProducto,

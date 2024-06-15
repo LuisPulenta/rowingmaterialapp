@@ -212,7 +212,7 @@ class _InstalacionNuevaScreenState extends State<InstalacionNuevaScreen>
   Widget build(BuildContext context) {
     double ancho = MediaQuery.of(context).size.width;
     return Scaffold(
-      backgroundColor: Color.fromARGB(255, 227, 225, 225),
+      backgroundColor: const Color.fromARGB(255, 227, 225, 225),
       appBar: AppBar(
         title: (widget.editMode)
             ? const Text('Editar Instalación')
@@ -220,7 +220,7 @@ class _InstalacionNuevaScreenState extends State<InstalacionNuevaScreen>
         centerTitle: true,
       ),
       bottomNavigationBar: BottomAppBar(
-        color: Color(0xFF781f1e),
+        color: const Color(0xFF781f1e),
         child: TabBar(
             controller: _tabController,
             indicatorColor: Colors.yellow,
@@ -348,35 +348,41 @@ class _InstalacionNuevaScreenState extends State<InstalacionNuevaScreen>
                     : SizedBox(
                         height: _series.length * 54, child: _showSeries()),
                 !widget.editMode ? _showSerie() : Container(),
-                const Divider(
-                  color: Colors.black,
-                ),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceAround,
-                  children: const [
-                    Titulo(
-                      texto: "MATERIALES DESCARGADOS",
-                      color: Color.fromARGB(255, 10, 226, 250),
-                    ),
-                  ],
-                ),
-                (_productos.isEmpty)
-                    ? const Padding(
-                        padding: EdgeInsets.symmetric(vertical: 5),
-                        child: Text(
-                          'No hay Materiales descargados',
-                          style: TextStyle(
-                              color: Colors.red,
-                              fontSize: 16,
-                              fontWeight: FontWeight.bold),
-                        ),
+                !widget.editMode
+                    ? Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceAround,
+                        children: const [
+                          Divider(
+                            color: Colors.black,
+                          ),
+                          Titulo(
+                            texto: "MATERIALES DESCARGADOS",
+                            color: Color.fromARGB(255, 10, 226, 250),
+                          ),
+                        ],
                       )
-                    : SizedBox(
-                        height: _productos.length * 24,
-                        child: _showProductos()),
-                const Divider(
-                  color: Colors.black,
-                ),
+                    : Container(),
+                !widget.editMode
+                    ? (_materiales.isNotEmpty)
+                        ? SizedBox(
+                            height: _materiales.length * 24,
+                            child: _showMateriales())
+                        : const Padding(
+                            padding: EdgeInsets.symmetric(vertical: 5),
+                            child: Text(
+                              'No hay Materiales descargados',
+                              style: TextStyle(
+                                  color: Colors.red,
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.bold),
+                            ),
+                          )
+                    : Container(),
+                !widget.editMode
+                    ? const Divider(
+                        color: Colors.black,
+                      )
+                    : Container(),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceAround,
                   children: const [
@@ -423,7 +429,11 @@ class _InstalacionNuevaScreenState extends State<InstalacionNuevaScreen>
           Center(
             child: Stack(
               children: [
-                _getContent(),
+                !widget.editMode
+                    ? _getContent()
+                    : const Center(
+                        child: Text("No habilitado en modo edición"),
+                      ),
                 _showLoader
                     ? const LoaderComponent(
                         text: 'Grabando...',
@@ -651,6 +661,17 @@ class _InstalacionNuevaScreenState extends State<InstalacionNuevaScreen>
                                                               }
                                                             }
 
+                                                            _materiales = [];
+                                                            for (var producto
+                                                                in _productos) {
+                                                              if (producto
+                                                                      .cantidad! >
+                                                                  0) {
+                                                                _materiales.add(
+                                                                    producto);
+                                                              }
+                                                            }
+                                                            setState(() {});
                                                             Navigator.pop(
                                                                 context);
                                                             setState(() {});
@@ -768,12 +789,12 @@ class _InstalacionNuevaScreenState extends State<InstalacionNuevaScreen>
   }
 
 //--------------------------------------------------------------
-//-------------------------- _showProductos --------------------
+//------------------------- _showMateriales --------------------
 //--------------------------------------------------------------
 
-  Widget _showProductos() {
+  Widget _showMateriales() {
     return ListView(
-      children: _productos.map((e) {
+      children: _materiales.map((e) {
         return Card(
           color: const Color.fromARGB(255, 142, 210, 237),
           shadowColor: Colors.white,
@@ -1428,13 +1449,13 @@ class _InstalacionNuevaScreenState extends State<InstalacionNuevaScreen>
 
                                             // VALIDAR QUE EL NUMERO DE SERIE ESTE DISPONIBLE
 
-                                            _series.forEach((serie) async {
+                                            for (var serie in _series) {
                                               if (serie.nroseriesalida
                                                       .toLowerCase() ==
                                                   _serie.toLowerCase()) {
                                                 existeSerie = true;
                                               }
-                                            });
+                                            }
 
                                             if (existeSerie) {
                                               displayAlerta(context, "Aviso",
@@ -1964,6 +1985,11 @@ class _InstalacionNuevaScreenState extends State<InstalacionNuevaScreen>
       displayAlerta(context, "Aviso", "No hay Equipos Registrados.");
     }
 
+    if ((_materiales.isEmpty) && (!widget.editMode)) {
+      isValid = false;
+      displayAlerta(context, "Aviso", "No hay Materiales descargados.");
+    }
+
     if (_signature == null && !widget.editMode) {
       isValid = false;
       displayAlerta(context, "Aviso", "Debe haber firma del cliente.");
@@ -2093,6 +2119,21 @@ class _InstalacionNuevaScreenState extends State<InstalacionNuevaScreen>
           };
           await ApiHelper.put('/api/LotesDetalles/',
               serie.nroregistro.toString(), requestLoteDetalle);
+        }
+
+        //------- Graba AppInstalacionesMateriales -----------------
+
+        for (var material in _materiales) {
+          Map<String, dynamic> requestMaterial = {
+            'IdInstalacionEquipo': decodedJson["idRegistro"],
+            'CodigoSIAG': material.codProducto,
+            'CodigoSAP': material.codigoSAP,
+            'Descripcion': material.denominacion,
+            'Cantidad': material.cantidad,
+          };
+          await ApiHelper.post(
+              '/api/AppInstalacionesEquipo/PostAppInstalacionesMateriales',
+              requestMaterial);
         }
       }
     } else {
@@ -2548,7 +2589,5 @@ class _InstalacionNuevaScreenState extends State<InstalacionNuevaScreen>
     setState(() {
       _productos = response.result;
     });
-
-    var a = 1;
   }
 }

@@ -32,6 +32,8 @@ class _InstalacionDetalleScreenState extends State<InstalacionDetalleScreen> {
 //---------------------------------------------------------------
 
   List<AppInstalacionesEquiposDetalle> _instalacionesDetalles = [];
+  List<Producto> _materiales = [];
+  List<AppInstalacionesMaterial> _materiales2 = [];
 
 //---------------------------------------------------------------
 //----------------------- initState -----------------------------
@@ -149,6 +151,22 @@ class _InstalacionDetalleScreenState extends State<InstalacionDetalleScreen> {
             const SizedBox(
               height: 20,
             ),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceAround,
+              children: const [
+                Titulo(
+                  texto: "MATERIALES DESCARGADOS",
+                  color: Color.fromARGB(255, 10, 226, 250),
+                ),
+              ],
+            ),
+            _materiales.isNotEmpty
+                ? SizedBox(
+                    height: _materiales.length * 24, child: _showMateriales())
+                : Container(),
+            const SizedBox(
+              height: 20,
+            ),
             _showButton(),
             const SizedBox(
               height: 30,
@@ -238,6 +256,54 @@ class _InstalacionDetalleScreenState extends State<InstalacionDetalleScreen> {
     }
     _instalacionesDetalles = response.result;
 
+    await _getMateriales();
+  }
+
+//------------------------------------------------------------------
+//------------------------------ _getMateriales --------------------
+//------------------------------------------------------------------
+
+  Future<void> _getMateriales() async {
+    var connectivityResult = await Connectivity().checkConnectivity();
+    if (connectivityResult == ConnectivityResult.none) {
+      setState(() {});
+      await showAlertDialog(
+          context: context,
+          title: 'Error',
+          message: 'Verifica que estes conectado a internet.',
+          actions: <AlertDialogAction>[
+            const AlertDialogAction(key: null, label: 'Aceptar'),
+          ]);
+      return;
+    }
+
+    Response response =
+        await ApiHelper.getMateriales(widget.instalacion.idRegistro);
+
+    if (!response.isSuccess) {
+      await showAlertDialog(
+          context: context,
+          title: 'Error',
+          message: "N° de Instalación no válidoABC",
+          actions: <AlertDialogAction>[
+            const AlertDialogAction(key: null, label: 'Aceptar'),
+          ]);
+
+      setState(() {});
+      return;
+    }
+    _materiales2 = response.result;
+
+    _materiales = [];
+
+    for (var material in _materiales2) {
+      _materiales.add(Producto(
+          codProducto: material.codigoSIAG,
+          codigoSAP: material.codigoSAP,
+          denominacion: material.descripcion,
+          cantidad: material.cantidad));
+    }
+
     setState(() {});
   }
 
@@ -266,12 +332,12 @@ class _InstalacionDetalleScreenState extends State<InstalacionDetalleScreen> {
                 const SizedBox(
                   width: 5,
                 ),
-                e.nombreEquipo!.length > 25
+                "${e.nombreEquipo!}-${e.familia}".length > 25
                     ? Text(
-                        e.nombreEquipo!.substring(0, 25),
+                        "${e.nombreEquipo!}-${e.familia}".substring(0, 25),
                       )
                     : Text(
-                        e.nombreEquipo!,
+                        "${e.nombreEquipo!}-${e.familia}",
                       ),
                 const Spacer(),
                 (e.linkFoto != null && e.linkFoto != '')
@@ -290,6 +356,55 @@ class _InstalacionDetalleScreenState extends State<InstalacionDetalleScreen> {
                         ),
                       )
                     : Container(),
+              ],
+            ),
+          ),
+        );
+      }).toList(),
+    );
+  }
+
+  //--------------------------------------------------------------
+//------------------------- _showMateriales --------------------
+//--------------------------------------------------------------
+
+  Widget _showMateriales() {
+    return ListView(
+      children: _materiales.map((e) {
+        return Card(
+          color: const Color.fromARGB(255, 142, 210, 237),
+          shadowColor: Colors.white,
+          elevation: 10,
+          margin: const EdgeInsets.fromLTRB(10, 2, 10, 2),
+          child: Container(
+            height: 22,
+            margin: const EdgeInsets.all(0),
+            padding: const EdgeInsets.symmetric(horizontal: 5),
+            child: Column(
+              children: [
+                Row(
+                  children: [
+                    Text(
+                      e.codigoSAP,
+                      style: const TextStyle(fontWeight: FontWeight.bold),
+                    ),
+                    const SizedBox(
+                      width: 5,
+                    ),
+                    e.denominacion.length > 22
+                        ? Text(
+                            e.denominacion.substring(0, 22),
+                          )
+                        : Text(
+                            e.denominacion,
+                          ),
+                    const Spacer(),
+                    Text(
+                      e.cantidad.toString(),
+                      style: const TextStyle(fontWeight: FontWeight.bold),
+                    ),
+                  ],
+                ),
               ],
             ),
           ),
