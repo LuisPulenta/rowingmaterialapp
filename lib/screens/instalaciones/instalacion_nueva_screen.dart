@@ -2399,7 +2399,7 @@ class _InstalacionNuevaScreenState extends State<InstalacionNuevaScreen>
 
     _tipoinstalacion = widget.instalacion.tipoInstalacion;
 
-    fechaInstalacion = DateTime.parse(widget.instalacion.fechaInstalacion!);
+    fechaInstalacion = DateTime.parse(widget.instalacion.fechaInstalacion);
 
     _pedido = widget.instalacion.pedido;
     _pedidoController.text = widget.instalacion.pedido;
@@ -2413,7 +2413,7 @@ class _InstalacionNuevaScreenState extends State<InstalacionNuevaScreen>
     _signdocumentController.text = widget.instalacion.documentoFirmante;
 
     _tipoPedido = widget.instalacion.tipoPedido == 'OMS' ? 0 : 1;
-    _coincideFirmante = widget.instalacion!.mismoFirmante == 0 ? false : true;
+    _coincideFirmante = widget.instalacion.mismoFirmante == 0 ? false : true;
 
     setState(() {});
   }

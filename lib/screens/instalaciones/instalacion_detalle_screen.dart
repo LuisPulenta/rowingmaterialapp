@@ -50,7 +50,6 @@ class _InstalacionDetalleScreenState extends State<InstalacionDetalleScreen> {
 //---------------------------------------------------------------
   @override
   Widget build(BuildContext context) {
-    double ancho = MediaQuery.of(context).size.width;
     return Scaffold(
       appBar: AppBar(
         title: Text('Instalación ${widget.instalacion.idRegistro.toString()}'),
@@ -69,7 +68,7 @@ class _InstalacionDetalleScreenState extends State<InstalacionDetalleScreen> {
             CustomRow(
               nombredato: 'Fecha: ',
               dato: DateFormat('dd/MM/yyyy')
-                  .format(DateTime.parse(widget.instalacion.fecha!)),
+                  .format(DateTime.parse(widget.instalacion.fecha)),
             ),
             CustomRow(
               nombredato: 'N° Obra: ',
@@ -77,9 +76,8 @@ class _InstalacionDetalleScreenState extends State<InstalacionDetalleScreen> {
             ),
             CustomRow(
               nombredato: 'Cliente: ',
-              dato: widget.instalacion.nombreCliente +
-                  ' ' +
-                  widget.instalacion.apellidoCliente,
+              dato:
+                  '${widget.instalacion.nombreCliente} ${widget.instalacion.apellidoCliente}',
             ),
             CustomRow(
               nombredato: 'Documento: ',
@@ -96,7 +94,7 @@ class _InstalacionDetalleScreenState extends State<InstalacionDetalleScreen> {
             CustomRow(
               nombredato: 'Fecha Instalación: ',
               dato: DateFormat('dd/MM/yyyy')
-                  .format(DateTime.parse(widget.instalacion.fechaInstalacion!)),
+                  .format(DateTime.parse(widget.instalacion.fechaInstalacion)),
             ),
             CustomRow(
               nombredato: 'Pedido: ',

@@ -277,7 +277,7 @@ class _InstalacionesScreenState extends State<InstalacionesScreen> {
                                       children: [
                                         Text(
                                             DateFormat('dd/MM/yyyy').format(
-                                                DateTime.parse(e.fecha!)),
+                                                DateTime.parse(e.fecha)),
                                             style: const TextStyle(
                                               fontSize: 12,
                                             )),
@@ -339,7 +339,7 @@ class _InstalacionesScreenState extends State<InstalacionesScreen> {
                                         Text(
                                             DateFormat('dd/MM/yyyy').format(
                                                 DateTime.parse(
-                                                    e.fechaInstalacion!)),
+                                                    e.fechaInstalacion)),
                                             style: const TextStyle(
                                               fontSize: 12,
                                             )),
@@ -363,7 +363,7 @@ class _InstalacionesScreenState extends State<InstalacionesScreen> {
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
                         ((e.auditado == 0) &&
-                                (DateTime.parse(e.fecha!)
+                                (DateTime.parse(e.fecha)
                                             .add(Duration(hours: 15)))
                                         .compareTo(DateTime.now()) >
                                     0)
@@ -379,7 +379,7 @@ class _InstalacionesScreenState extends State<InstalacionesScreen> {
                               )
                             : Container(),
                         ((e.auditado == 0) &&
-                                (DateTime.parse(e.fecha!)
+                                (DateTime.parse(e.fecha)
                                             .add(Duration(hours: 15)))
                                         .compareTo(DateTime.now()) >
                                     0)
