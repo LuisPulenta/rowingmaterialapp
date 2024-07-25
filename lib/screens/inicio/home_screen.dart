@@ -126,14 +126,45 @@ class _HomeScreenState extends State<HomeScreen> {
                   onTap: widget.user.habilitaInstalacionesAPP == 1
                       ? () async {
                           await Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) => InstalacionesScreen(
-                                user: widget.user,
-                                imei: widget.imei,
-                              ),
-                            ),
-                          );
+                              context,
+                              // MaterialPageRoute(
+                              //     builder: (context) => HomeScreen(
+                              //           user: user,
+                              //           imei: _imeiNo,
+                              //         )));
+                              PageRouteBuilder(
+                                  pageBuilder: (BuildContext context,
+                                          Animation<double> animation,
+                                          Animation<double>
+                                              secondaryAnimation) =>
+                                      InstalacionesScreen(
+                                        user: widget.user,
+                                        imei: widget.imei,
+                                      ),
+                                  transitionDuration:
+                                      Duration(milliseconds: 500),
+                                  transitionsBuilder: (context, animation,
+                                      secondaryAnimation, child) {
+                                    final curvedAnimation = CurvedAnimation(
+                                        parent: animation,
+                                        curve: Curves.easeInOut);
+
+                                    return FadeTransition(
+                                        child: child,
+                                        opacity:
+                                            Tween<double>(begin: 0.0, end: 1.0)
+                                                .animate(curvedAnimation));
+                                  }));
+
+                          // Navigator.push(
+                          //   context,
+                          //   MaterialPageRoute(
+                          //     builder: (context) => InstalacionesScreen(
+                          //       user: widget.user,
+                          //       imei: widget.imei,
+                          //     ),
+                          //   ),
+                          // );
                         }
                       : null,
                   child: SizedBox(

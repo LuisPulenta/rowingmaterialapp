@@ -446,41 +446,89 @@ class _InstalacionesScreenState extends State<InstalacionesScreen> {
 
   void _addInstalacion() async {
     String? result = await Navigator.push(
-      context,
-      MaterialPageRoute(
-        builder: (context) => InstalacionNuevaScreen(
-          user: widget.user,
-          imei: widget.imei,
-          editMode: false,
-          instalacion: AppInstalacionesEquipo(
-              idRegistro: 0,
-              nroObra: 0,
-              idUsuario: 0,
-              imei: '',
-              fecha: '',
-              latitud: '',
-              longitud: '',
-              fechaInstalacion: '',
-              grupo: '',
-              causante: '',
-              pedido: '',
-              nombreCliente: '',
-              apellidoCliente: '',
-              documento: '',
-              domicilioInstalacion: '',
-              entreCalles: '',
-              firmacliente: '',
-              nombreApellidoFirmante: '',
-              tipoInstalacion: '',
-              esAveria: '',
-              auditado: 0,
-              firmaclienteImageFullPath: '',
-              documentoFirmante: '',
-              mismoFirmante: 0,
-              tipoPedido: ''),
-        ),
-      ),
-    );
+        context,
+        PageRouteBuilder(
+            pageBuilder: (BuildContext context, Animation<double> animation,
+                    Animation<double> secondaryAnimation) =>
+                InstalacionNuevaScreen(
+                  user: widget.user,
+                  imei: widget.imei,
+                  editMode: false,
+                  instalacion: AppInstalacionesEquipo(
+                      idRegistro: 0,
+                      nroObra: 0,
+                      idUsuario: 0,
+                      imei: '',
+                      fecha: '',
+                      latitud: '',
+                      longitud: '',
+                      fechaInstalacion: '',
+                      grupo: '',
+                      causante: '',
+                      pedido: '',
+                      nombreCliente: '',
+                      apellidoCliente: '',
+                      documento: '',
+                      domicilioInstalacion: '',
+                      entreCalles: '',
+                      firmacliente: '',
+                      nombreApellidoFirmante: '',
+                      tipoInstalacion: '',
+                      esAveria: '',
+                      auditado: 0,
+                      firmaclienteImageFullPath: '',
+                      documentoFirmante: '',
+                      mismoFirmante: 0,
+                      tipoPedido: ''),
+                ),
+            transitionDuration: Duration(milliseconds: 1000),
+            transitionsBuilder:
+                (context, animation, secondaryAnimation, child) {
+              final curvedAnimation =
+                  CurvedAnimation(parent: animation, curve: Curves.easeInOut);
+
+              return FadeTransition(
+                  child: child,
+                  opacity: Tween<double>(begin: 0.0, end: 1.0)
+                      .animate(curvedAnimation));
+            }));
+
+    // Navigator.push(
+    //   context,
+    //   MaterialPageRoute(
+    //     builder: (context) => InstalacionNuevaScreen(
+    //       user: widget.user,
+    //       imei: widget.imei,
+    //       editMode: false,
+    //       instalacion: AppInstalacionesEquipo(
+    //           idRegistro: 0,
+    //           nroObra: 0,
+    //           idUsuario: 0,
+    //           imei: '',
+    //           fecha: '',
+    //           latitud: '',
+    //           longitud: '',
+    //           fechaInstalacion: '',
+    //           grupo: '',
+    //           causante: '',
+    //           pedido: '',
+    //           nombreCliente: '',
+    //           apellidoCliente: '',
+    //           documento: '',
+    //           domicilioInstalacion: '',
+    //           entreCalles: '',
+    //           firmacliente: '',
+    //           nombreApellidoFirmante: '',
+    //           tipoInstalacion: '',
+    //           esAveria: '',
+    //           auditado: 0,
+    //           firmaclienteImageFullPath: '',
+    //           documentoFirmante: '',
+    //           mismoFirmante: 0,
+    //           tipoPedido: ''),
+    //     ),
+    //   ),
+    // );
     if (result == 'yes') {
       _getInstalaciones();
     }

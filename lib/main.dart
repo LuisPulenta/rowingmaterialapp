@@ -47,6 +47,7 @@ class _MyAppState extends State<MyApp> {
       debugShowCheckedModeBanner: false,
       title: 'Rowing App',
       theme: ThemeData(
+        //useMaterial3: true,
         brightness: Brightness.light,
         primaryColor: const Color(0xFF781f1e),
         appBarTheme: const AppBarTheme(
