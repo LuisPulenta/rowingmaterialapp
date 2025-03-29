@@ -91,147 +91,155 @@ class _HomeScreenState extends State<HomeScreen> {
             const SizedBox(
               height: 10,
             ),
-            SizedBox(
-              height: 80,
-              child: AnimatedTextKit(
-                animatedTexts: [
-                  for (final text in ['Bienvenido/a'])
-                    WavyAnimatedText(
-                      text,
-                      textStyle: nTextstyle,
-                      textAlign: TextAlign.center,
-                    )
-                ],
-                repeatForever: true,
-              ),
+            const SizedBox(
+              height: 40,
+              child: Text('Bienvenido/a',
+                  textAlign: TextAlign.center, style: nTextstyle),
+              // child: AnimatedTextKit(
+              //   animatedTexts: [
+              //     for (final text in ['Bienvenido/a'])
+              //       WavyAnimatedText(
+              //         text,
+              //         textStyle: nTextstyle,
+              //         textAlign: TextAlign.center,
+              //       )
+              //   ],
+              //   repeatForever: false,
+              // ),
             ),
             SizedBox(
               height: 80,
               width: double.infinity,
-              child: AnimatedTextKit(
-                animatedTexts: [
-                  for (final text in [widget.user.nombre!.replaceAll("  ", "")])
-                    WavyAnimatedText(
-                      text,
-                      textStyle: nTextstyle,
-                      textAlign: TextAlign.center,
-                    )
+              child: Text(widget.user.nombre!.replaceAll("  ", ""),
+                  textAlign: TextAlign.center, style: nTextstyle),
+              // child: AnimatedTextKit(
+              //   animatedTexts: [
+              //     for (final text in [widget.user.nombre!.replaceAll("  ", "")])
+              //       WavyAnimatedText(
+              //         text,
+              //         textStyle: nTextstyle,
+              //         textAlign: TextAlign.center,
+              //       )
+              //   ],
+              //   repeatForever: false,
+              // ),
+            ),
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 10),
+              child: Row(
+                children: [
+                  InkWell(
+                    onTap: widget.user.habilitaInstalacionesAPP == 1
+                        ? () async {
+                            await Navigator.push(
+                                context,
+                                // MaterialPageRoute(
+                                //     builder: (context) => HomeScreen(
+                                //           user: user,
+                                //           imei: _imeiNo,
+                                //         )));
+                                PageRouteBuilder(
+                                    pageBuilder: (BuildContext context,
+                                            Animation<double> animation,
+                                            Animation<double>
+                                                secondaryAnimation) =>
+                                        InstalacionesScreen(
+                                          user: widget.user,
+                                          imei: widget.imei,
+                                        ),
+                                    transitionDuration:
+                                        const Duration(milliseconds: 500),
+                                    transitionsBuilder: (context, animation,
+                                        secondaryAnimation, child) {
+                                      final curvedAnimation = CurvedAnimation(
+                                          parent: animation,
+                                          curve: Curves.easeInOut);
+
+                                      return FadeTransition(
+                                          child: child,
+                                          opacity: Tween<double>(
+                                                  begin: 0.0, end: 1.0)
+                                              .animate(curvedAnimation));
+                                    }));
+
+                            // Navigator.push(
+                            //   context,
+                            //   MaterialPageRoute(
+                            //     builder: (context) => InstalacionesScreen(
+                            //       user: widget.user,
+                            //       imei: widget.imei,
+                            //     ),
+                            //   ),
+                            // );
+                          }
+                        : null,
+                    child: SizedBox(
+                      width: ancho * 0.5,
+                      child: Boton(
+                        icon: FontAwesomeIcons.barcode,
+                        texto: "Equipos",
+                        color1: widget.user.habilitaInstalacionesAPP == 1
+                            ? const Color(0xff6989F5)
+                            : Colors.grey,
+                        color2: widget.user.habilitaInstalacionesAPP == 1
+                            ? const Color(0xff906EF5)
+                            : Colors.grey,
+                      ),
+                    ),
+                  ),
+                  // InkWell(
+                  //   onTap: null,
+                  //   child: SizedBox(
+                  //     width: ancho * 0.5,
+                  //     child: const Boton(
+                  //       icon: FontAwesomeIcons.carBurst,
+                  //       texto: "Vehículos",
+                  //       color1: Colors.grey,
+                  //       color2: Colors.grey,
+                  //     ),
+                  //   ),
+                  // ),
                 ],
-                repeatForever: true,
               ),
             ),
-            Row(
-              children: [
-                InkWell(
-                  onTap: widget.user.habilitaInstalacionesAPP == 1
-                      ? () async {
-                          await Navigator.push(
-                              context,
-                              // MaterialPageRoute(
-                              //     builder: (context) => HomeScreen(
-                              //           user: user,
-                              //           imei: _imeiNo,
-                              //         )));
-                              PageRouteBuilder(
-                                  pageBuilder: (BuildContext context,
-                                          Animation<double> animation,
-                                          Animation<double>
-                                              secondaryAnimation) =>
-                                      InstalacionesScreen(
-                                        user: widget.user,
-                                        imei: widget.imei,
-                                      ),
-                                  transitionDuration:
-                                      Duration(milliseconds: 500),
-                                  transitionsBuilder: (context, animation,
-                                      secondaryAnimation, child) {
-                                    final curvedAnimation = CurvedAnimation(
-                                        parent: animation,
-                                        curve: Curves.easeInOut);
-
-                                    return FadeTransition(
-                                        child: child,
-                                        opacity:
-                                            Tween<double>(begin: 0.0, end: 1.0)
-                                                .animate(curvedAnimation));
-                                  }));
-
-                          // Navigator.push(
-                          //   context,
-                          //   MaterialPageRoute(
-                          //     builder: (context) => InstalacionesScreen(
-                          //       user: widget.user,
-                          //       imei: widget.imei,
-                          //     ),
-                          //   ),
-                          // );
-                        }
-                      : null,
-                  child: SizedBox(
-                    width: ancho * 0.5,
-                    child: Boton(
-                      icon: FontAwesomeIcons.barcode,
-                      texto: "Equipos",
-                      color1: widget.user.habilitaInstalacionesAPP == 1
-                          ? const Color(0xff6989F5)
-                          : Colors.grey,
-                      color2: widget.user.habilitaInstalacionesAPP == 1
-                          ? const Color(0xff906EF5)
-                          : Colors.grey,
-                    ),
-                  ),
-                ),
-                InkWell(
-                  onTap: null,
-                  child: SizedBox(
-                    width: ancho * 0.5,
-                    child: const Boton(
-                      icon: FontAwesomeIcons.carBurst,
-                      texto: "Vehículos",
-                      color1: Colors.grey,
-                      color2: Colors.grey,
-                    ),
-                  ),
-                ),
-              ],
-            ),
-            Row(
-              children: [
-                InkWell(
-                  onTap: null,
-                  child: SizedBox(
-                    width: ancho * 0.5,
-                    child: const Boton(
-                      icon: FontAwesomeIcons.users,
-                      texto: "RR.HH.",
-                      color1: Color.fromARGB(255, 137, 137, 137),
-                      color2: Color.fromARGB(255, 137, 137, 137),
-                    ),
-                  ),
-                ),
-                InkWell(
-                  onTap: null,
-                  child: SizedBox(
-                    width: ancho * 0.5,
-                    child: const Boton(
-                      icon: FontAwesomeIcons.helmetSafety,
-                      texto: "SS&HH",
-                      color1: Color.fromARGB(255, 137, 137, 137),
-                      color2: Color.fromARGB(255, 137, 137, 137),
-                    ),
-                  ),
-                ),
-              ],
-            ),
+            // Row(
+            //   children: [
+            //     InkWell(
+            //       onTap: null,
+            //       child: SizedBox(
+            //         width: ancho * 0.5,
+            //         child: const Boton(
+            //           icon: FontAwesomeIcons.users,
+            //           texto: "RR.HH.",
+            //           color1: Color.fromARGB(255, 137, 137, 137),
+            //           color2: Color.fromARGB(255, 137, 137, 137),
+            //         ),
+            //       ),
+            //     ),
+            //     InkWell(
+            //       onTap: null,
+            //       child: SizedBox(
+            //         width: ancho * 0.5,
+            //         child: const Boton(
+            //           icon: FontAwesomeIcons.helmetSafety,
+            //           texto: "SS&HH",
+            //           color1: Color.fromARGB(255, 137, 137, 137),
+            //           color2: Color.fromARGB(255, 137, 137, 137),
+            //         ),
+            //       ),
+            //     ),
+            //   ],
+            // ),
             const Spacer(),
             Row(
+              mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 InkWell(
                   onTap: () {
                     _logOut();
                   },
                   child: SizedBox(
-                    width: ancho * 1,
+                    width: ancho * 0.95,
                     child: const Boton(
                       icon: FontAwesomeIcons.doorOpen,
                       texto: "Cerrar Sesión",
